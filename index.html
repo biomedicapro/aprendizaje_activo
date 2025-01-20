@@ -2483,7 +2483,7 @@ function markFavorite(subject, theme, slide, button) {
     // Si el slide ya está en favoritos, lo eliminamos
     favorites[subject][theme].splice(slideIndex, 1);
     button.style.color = ""; // Volvemos el corazón a su color original
-
+    showNotification("Favorito eliminado.");
     // Si no quedan favoritos en la temática, eliminamos la clave
     if (favorites[subject][theme].length === 0) {
       delete favorites[subject][theme];
