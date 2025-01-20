@@ -1,0 +1,4296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Proyecto TikTok Estudio</title>
+	<style>
+		/* ==================================
+		       1. ESTILOS GLOBALES (CSS)
+		       ================================== */
+		
+		    /* Reset y configuraciones básicas */
+		    * {
+		      margin: 0; 
+		      padding: 0; 
+		      box-sizing: border-box;
+		    }
+			
+		    body, html {
+		      height: 100%;
+		      width: 100%;
+		      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		      background-color: #f5f5f5;
+		      color: #333;
+		      overflow: hidden; /* Evita scroll en la pantalla principal */
+		    }
+		
+		    a {
+		      text-decoration: none;
+		    }
+		
+		    /* ==================================
+		       2. LAYOUT / SIDEBAR
+		       ================================== */
+		
+		    #sidebar {
+		      position: fixed;
+		      left: 0;
+		      top: 0;
+		      height: 100%;
+		      width: 240px;
+		      background-color: #ffffff;
+		      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+		      transition: transform 0.3s ease;
+		      z-index: 1000;
+		      touch-action: pan-y;
+		    }
+		
+		    #sidebar.hidden {
+		      transform: translateX(-240px);
+		    }
+		
+		    #sidebar .toggle-btn {
+		      position: absolute;
+		      top: 20px;
+		      right: -40px;
+		      background-color: #000000;
+		      border: none;
+		      color: #fff;
+		      padding: 10px;
+		      cursor: pointer;
+		      border-radius: 5px 0 0 5px;
+		      font-size: 18px;
+		    }
+		
+		    #sidebar ul {
+		      list-style: none;
+		      padding: 80px 20px 20px 20px;
+		    }
+		
+		    #sidebar ul li {
+		      margin-bottom: 15px;
+		    }
+		
+		    #sidebar ul li button {
+		      background: #000000;
+		      border: none;
+		      color: #fff;
+		      font-size: 16px;
+		      cursor: pointer;
+		      width: 100%;
+		      text-align: left;
+		      padding: 12px;
+		      border-radius: 5px;
+		      transition: background 0.3s, transform 0.3s;
+		    }
+		
+		    #sidebar ul li button:hover {
+		      background-color: #333333;
+		      transform: translateX(5px);
+		    }
+		
+		    /* ==================================
+		       3. CONTENEDOR PRINCIPAL
+		       ================================== */
+		
+		    #main {
+		      margin-left: 240px;
+		      width: calc(100% - 240px);
+		      height: 100%;
+		      transition: margin-left 0.3s ease, width 0.3s ease;
+		      position: relative;
+		      background-color: #ffffff;
+		    }
+		
+		    #main.full {
+		      margin-left: 0;
+		      width: 100%;
+		    }
+		
+		    /* ==================================
+		       4. INTERFACES
+		       ================================== */
+		
+		    .interface {
+		      position: absolute;
+		      top: 35px; 
+		      left: 0;
+		      width: 100%;
+		      height: 100%;
+		      overflow-y: auto;
+		      padding: 20px 10px;
+		      display: none;
+		      opacity: 0;
+		      transition: opacity 0.5s ease, transform 0.5s ease;
+		    }
+		
+		    .interface.active {
+		      display: block;
+		      opacity: 1;
+		      transform: translateX(0);
+		    }
+		
+		    .interface.hidden {
+		      opacity: 0;
+		      transform: translateX(-50px);
+		    }
+		
+/* ==================================
+   5. GRIDS Y TARJETAS (CARD)
+   ================================== */
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr); /* Máximo 2 tarjetas por fila */
+  padding: 10px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.card {
+  background: #f8f9fa; /* Fondo uniforme */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+margin:10px;
+cursor: pointer;
+
+
+  /* Agregado para altura mínima */
+  min-height: 150px; /* Ajusta este valor según tus necesidades */
+}
+
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #eaeaea; /* Cambio de color al pasar el cursor */
+}
+
+.card-icon {
+  font-size: 3em;
+  margin-bottom: 15px;
+  color: #333; /* Color del ícono */
+}
+
+.card h3 {
+  margin: 10px 0;
+  font-size: 1.2em;
+  color: #ffffff;
+}
+
+.card p {
+  font-size: 0.9em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.card button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 15px;
+}
+
+.card button:hover {
+  background-color: #444;
+  transform: scale(1.02);
+}
+
+/* Responsividad */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr; /* Una tarjeta por fila en pantallas pequeñas */
+  }
+}
+
+		    /* ==================================
+		       6. DIAPOSITIVAS TIKTOK
+		       ================================== */
+		
+		    #slide-container {
+		      position: relative;
+		      height: 100%;
+		      width: 100%;
+		      overflow: hidden;
+		      background-color: #ffffff;
+		    }
+		
+		    .slide {
+		      position: absolute;
+		      top: 0; 
+		      left: -25px;
+		      width: 100%;
+		      height: 100%;
+		      padding: 60px 40px;
+		      display: flex;
+		      flex-direction: column;
+		      align-items: center;
+		      transition: transform 0.5s ease, opacity 0.5s ease;
+		      opacity: 0;
+		      color: #333;
+		      background-color: #ffffff;
+		    }
+		
+		    .slide.active {
+		      opacity: 1;
+		      transform: translateY(0);
+		      z-index: 1;
+		    }
+		
+		    .slide.up {
+		      transform: translateY(-100%);
+		      z-index: 0;
+		    }
+		
+		    .slide.down {
+		      transform: translateY(100%);
+		      z-index: 0;
+		    }
+		
+		    .slide h2 {
+		      text-align: center;
+		      margin-bottom: 20px;
+		      font-size: 28px;
+		    }
+		
+		    .slide p {
+		      text-align: justify;
+		      line-height: 1.6;
+		      max-width: 800px;
+		    }
+		
+		    /* Íconos flotantes al costado derecho */
+		    .slide-icons {
+		      position: absolute;
+		      right: -20px;
+		      top: 50%;
+		      transform: translateY(-50%);
+		      display: flex;
+		      flex-direction: column;
+		      gap: 15px;
+		    }
+		
+		    .slide-icon-btn {
+		      background-color: #000;
+		      color: #fff;
+		      border: none;
+		      border-radius: 50%;
+		      width: 45px;
+		      height: 45px;
+		      cursor: pointer;
+		      font-size: 18px;
+		      display: flex;
+		      align-items: center;
+		      justify-content: center;
+		      opacity: 0.8;
+		      transition: opacity 0.3s;
+		    }
+		
+		    .slide-icon-btn:hover {
+		      opacity: 1;
+		    }
+		
+		    /* Botones de navegación de diapositivas */
+		    .nav-button {
+		      position: absolute;
+		      top: 50%;
+		      transform: translateY(-50%);
+		      background-color: #000000;
+		      border: none;
+		      color: #fff;
+		      padding: 15px;
+		      cursor: pointer;
+		      border-radius: 50%;
+		      opacity: 0.7;
+		      transition: opacity 0.3s, transform 0.3s;
+		      font-size: 10px;
+		      z-index: 2;
+		    }
+		
+		    .nav-button:hover {
+		      opacity: 1;
+		      transform: scale(1.1);
+		    }
+		
+		    #prevBtn {
+		      top: 25px;
+right: 20px;
+		    }
+		
+		    #nextBtn {
+		      top: 70px;
+right: 20px;
+
+		    }
+		
+		    /* ==================================
+		       7. POPUPS / MODALES
+		       ================================== */
+		
+		    .modal-overlay {
+		      position: fixed;
+		      top: 0; left: 0; 
+		      width: 100%; 
+		      height: 100%;
+		      background: rgba(0,0,0,0.5);
+		      display: none;
+		      justify-content: center;
+		      align-items: center;
+		      z-index: 9999;
+		    }
+		
+		    .modal-overlay.active {
+		      display: flex;
+		    }
+		
+		    .modal-content {
+		      background: #fff;
+		      padding: 20px;
+		      border-radius: 8px;
+		      max-width: 600px;
+		      width: 90%;
+		      max-height: 80%;
+		      overflow-y: auto;
+		      position: relative;
+		    }
+		
+		    .modal-close-btn {
+		      position: absolute;
+		      top: 10px; 
+		      right: 10px;
+		      background: #000;
+		      color: #fff;
+		      border: none;
+		      border-radius: 50%;
+		      width: 30px; 
+		      height: 30px;
+		      cursor: pointer;
+		      text-align: center;
+		    }
+		
+		    /* ==================================
+		       8. TABLAS PARA INTERFACES
+		       ================================== */
+		
+		    table {
+		      width: 100%;
+		      border-collapse: collapse;
+		      margin-top: 20px;
+		    }
+		
+		    table thead {
+		      background-color: #ddd;
+		    }
+		
+		    table th, table td {
+		      padding: 10px;
+		      border: 1px solid #ccc;
+		    }
+		
+		    /* ==================================
+		       9. SCROLL PERSONALIZADO
+		       ================================== */
+		
+		    ::-webkit-scrollbar {
+		      width: 8px;
+		    }
+		
+		    ::-webkit-scrollbar-track {
+		      background: #f0f0f0;
+		    }
+		
+		    ::-webkit-scrollbar-thumb {
+		      background: #c0c0c0;
+		      border-radius: 4px;
+		    }
+		
+		    ::-webkit-scrollbar-thumb:hover {
+		      background: #a0a0a0;
+		    }
+		
+		    /* ==================================
+		       10. RESPONSIVIDAD
+		       ================================== */
+		
+		    @media (max-width: 768px) {
+		      #sidebar {
+		        width: 200px;
+		      }
+		
+		      #sidebar.hidden {
+		        transform: translateX(-200px);
+		      }
+		
+		      #main {
+		        margin-left: 200px;
+		        width: calc(100% - 200px);
+		      }
+		
+		      #main.full {
+		        margin-left: 0;
+		        width: 100%;
+		      }
+		    }
+		
+
+.exam-btn {
+  background-color: black; /* Fondo negro consistente */
+  color: white;           /* Texto blanco */
+  border: none;           /* Sin borde */
+  border-radius: 8px;     /* Bordes redondeados */
+  padding: 10px 20px;     /* Espaciado interno */
+  cursor: pointer;        /* Cursor de puntero */
+  font-weight: bold;      /* Texto en negrita */
+  font-size: 1em;         /* Tamaño de fuente consistente */
+  transition: background-color 0.3s ease; /* Transición suave */
+}
+
+.exam-btn:hover {
+  background-color: #333; /* Fondo más claro al pasar el mouse */
+}
+
+.exam-btn:disabled {
+  background-color: #888; /* Fondo gris para botones deshabilitados */
+  cursor: not-allowed;    /* Cursor no permitido */
+}
+
+
+		
+	</style>
+</head>
+<body>
+
+	<!-- ==================================
+       SECCIÓN 1: BARRA LATERAL
+       ================================== -->
+	<div id="sidebar">
+		<button class="toggle-btn" id="toggleSidebar">&#9776;</button>
+		<ul>
+			<li><button data-interface="home">Inicio</button></li>
+			<li><button data-interface="subjects">Asignaturas</button></li>
+			<li><button data-interface="favorites">Favoritos</button></li>
+			<li><button data-interface="notes">Notas</button></li>
+			<li><button data-interface="questionsRepeat">Preguntas</button></li>
+			<li><button data-interface="flashcardsRepeat">Flashcards</button></li>
+			<li><button data-interface="exam">Examen</button></li>
+			<li><button data-interface="performance">Desempeño</button></li>
+		</ul>
+	</div>
+
+	<!-- ==================================
+       SECCIÓN 2: CONTENEDOR MAIN
+       ================================== -->
+	<div id="main">
+		<!-- Interfaz Inicio -->
+<div class="interface active" id="home">
+    <h1>Bienvenido a TikTok Estudio</h1>
+    <p>Explora las secciones disponibles:</p>
+    <div class="grid" id="homeGrid"></div>
+  </div>
+		<!-- Interfaz Asignaturas -->
+		<div class="interface" id="subjects">
+			<h2>Asignaturas</h2>
+			<div class="grid" id="subjectsGrid"></div>
+		</div>
+
+		<!-- Interfaz Temáticas -->
+		<div class="interface" id="themes">
+			<h2 id="themeTitle">Temáticas</h2>
+			<div class="grid" id="themesGrid"></div>
+		</div>
+
+		<!-- Interfaz Diapositivas -->
+		<div class="interface" id="slides">
+			<div id="slide-container"></div>
+			<!-- Botones de navegación vertical -->
+			<button class="nav-button" id="prevBtn">&#8593;</button>
+			<button class="nav-button" id="nextBtn">&#8595;</button>
+		</div>
+
+		<!-- Interfaz Favoritos -->
+		<div class="interface" id="favorites">
+			<h2>Favoritos</h2>
+			<p>Diapositivas que marcaste con "Me gusta". Agrupadas por asignatura/temática.</p>
+			<div id="favoritesContent"></div>
+		</div>
+
+		<!-- Interfaz Notas -->
+		<div class="interface" id="notes">
+			<h2>Notas</h2>
+			<p>Lista de comentarios asociados a cada diapositiva. Tabla 2x2.</p>
+			<div id="notesContent"></div>
+		</div>
+
+		<!-- Interfaz Preguntas (Repetir) -->
+		<div class="interface" id="questionsRepeat">
+			<h2>Preguntas para Repetir</h2>
+			<p>Estudia aquí las preguntas marcadas como "repetir" de forma individual.</p>
+			<div id="questionsContent"></div>
+		</div>
+
+		<!-- Interfaz Flashcards (Repetir) -->
+		<div class="interface" id="flashcardsRepeat">
+			<h2>Flashcards para Repetir</h2>
+			<p>Estudia aquí las flashcards marcadas como "repetir".</p>
+			<div id="flashcardsContent"></div>
+		</div>
+
+		<!-- Interfaz Examen -->
+		<div class="interface" id="exam">
+			<h2>Examen</h2>
+			<p>Configura y realiza un examen con preguntas de distintas asignaturas o temáticas.</p>
+			<div id="examContent"></div>
+		</div>
+
+		<!-- Interfaz Desempeño -->
+		<div class="interface" id="performance">
+			<h2>Desempeño</h2>
+			<p>Estadísticas de tu progreso, calificaciones y uso.</p>
+			<div id="performanceContent"></div>
+		</div>
+	</div>
+
+	<!-- ==================================
+       SECCIÓN 3: POPUPS / MODALES GLOBALES
+       ================================== -->
+
+	<!-- Modal para UNA PREGUNTA (estilo flashcard) -->
+	<div class="modal-overlay" id="questionCardModal">
+		<div class="modal-content">
+			<button class="modal-close-btn" id="closeQuestionCardModal">&times;</button>
+
+			<h3 id="questionTitle"></h3>
+			<div id="questionOptions"></div>
+			<div id="questionFeedback" style="margin-top:10px; font-weight:bold;"></div>
+
+			<button id="prevQuestionCardBtn">Anterior</button>
+			<button id="submitQuestionBtn">Responder</button>
+			<button id="nextQuestionCardBtn">Siguiente</button>
+			<button id="repeatQuestionCardBtn">Repetir</button>
+		</div>
+	</div>
+
+	<!-- Modal para Flashcards -->
+	<div class="modal-overlay" id="flashcardsModal">
+		<div class="modal-content">
+			<button class="modal-close-btn" id="closeFlashcardsModal">&times;</button>
+			<h3>Flashcards</h3>
+			<div id="flashcardBody"></div>
+			<button id="repeatFlashcardBtn">Repetir Flashcard Actual</button>
+		</div>
+	</div>
+
+	<script>
+		/* ==================================
+		       4. LÓGICA / JAVASCRIPT
+		       ================================== */
+		
+		    /* ---------- A. Datos de Ejemplo ---------- */
+		    const data = {
+
+
+  "Microbiología": {
+    "Bacterias": [
+      {
+        "id": "micro_bacterias_1",
+        "content": `<h2>Estructura bacteriana</h2><p>La estructura bacteriana, aunque compartida en ciertos aspectos entre las bacterias <strong>Grampositivas</strong> y <strong>Gramnegativas</strong>, exhibe diferencias clave que determinan su comportamiento, interacción con el huésped y susceptibilidad a tratamientos antimicrobianos. Ambas categorías poseen <strong>membranas citoplásmicas</strong>, donde se localizan enzimas esenciales como las <strong>transpeptidasas</strong> y <strong>carboxipeptidasas</strong>. Estas enzimas participan activamente en la construcción de la pared celular o <strong>peptidoglicano</strong>, y son conocidas como <strong>proteínas fijadoras de penicilina (PBP)</strong>, dado que representan el objetivo principal de los antibióticos β-lactámicos. Al inhibir estas PBP, los β-lactámicos interrumpen la síntesis del <strong>peptidoglicano</strong>, comprometiendo la integridad estructural de la bacteria y llevándola a la lisis osmótica.</p>`,
+        "questions": [
+          {
+            "text": "¿Cuál es la principal diferencia estructural entre bacterias Grampositivas y Gramnegativas?",
+            "options": [
+              "Las Gramnegativas tienen una capa gruesa de peptidoglicano.",
+              "Las Grampositivas tienen una membrana externa adicional.",
+              "Las Grampositivas tienen una capa gruesa de peptidoglicano.",
+              "Las Gramnegativas carecen de membrana citoplásmica."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "¿Qué función tienen las proteínas fijadoras de penicilina (PBP) en las bacterias?",
+            "options": [
+              "Transportan nutrientes a través de la membrana celular.",
+              "Catalizan la síntesis de ADN durante la replicación bacteriana.",
+              "Participan en la síntesis y mantenimiento del peptidoglicano.",
+              "Degradan los β-lactámicos para evitar su acción antimicrobiana."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "¿Qué ocurre cuando un antibiótico β-lactámico inhibe las PBP de una bacteria?",
+            "options": [
+              "Incrementa la producción de toxinas bacterianas.",
+              "Interrumpe la síntesis de peptidoglicano, causando lisis osmótica.",
+              "Activa la replicación bacteriana por mecanismos compensatorios.",
+              "Genera resistencia bacteriana al antibiótico."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿En qué consiste la tinción de Gram?",
+            "answer": "Es un método de tinción diferencial que clasifica bacterias en Grampositivas o Gramnegativas según la composición de su pared celular."
+          },
+          {
+            "question": "¿Cuál es la principal barrera de las bacterias Gramnegativas contra antibióticos?",
+            "answer": "La membrana externa, que contiene lipopolisacáridos y porinas que limitan la entrada de fármacos."
+          },
+          {
+            "question": "¿Qué componente estructural distingue a las bacterias Grampositivas?",
+            "answer": "Su gruesa capa de peptidoglicano, que puede contener ácido teicoico y ácido lipoteicoico."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_2",
+        "content": `<h2>Peptidoglicano</h2><p>El <strong>peptidoglicano</strong> es un componente esencial de la pared celular, pero su disposición difiere drásticamente entre ambos grupos bacterianos. Las bacterias <strong>Grampositivas</strong> poseen una capa gruesa de <strong>peptidoglicano</strong> que no solo actúa como barrera mecánica, sino que también proporciona resistencia frente a daños osmóticos. Por el contrario, las <strong>Gramnegativas</strong> presentan una capa mucho más delgada de <strong>peptidoglicano</strong>, lo que, junto con su membrana externa, les confiere mayor flexibilidad estructural pero menor resistencia a la presión osmótica. Esta diferencia fundamental es la base del método de tinción de Gram, donde las bacterias <strong>Grampositivas</strong> retienen el cristal violeta debido a su gruesa capa de <strong>peptidoglicano</strong>, mientras que las <strong>Gramnegativas</strong> no lo hacen.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué función principal desempeña el peptidoglicano en las bacterias Grampositivas?",
+            "options": [
+              "Permitir el intercambio de nutrientes a través de la membrana externa.",
+              "Proporcionar resistencia frente a daños osmóticos.",
+              "Facilitar la entrada de antibióticos β-lactámicos.",
+              "Aumentar la flexibilidad estructural de la pared celular."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "En un caso clínico, un paciente tiene una infección causada por una bacteria Grampositiva. ¿Qué característica estructural clave puede explicar su sensibilidad al cristal violeta durante la tinción de Gram?",
+            "options": [
+              "La presencia de una membrana externa con lipopolisacáridos.",
+              "Una capa gruesa de peptidoglicano que retiene el cristal violeta.",
+              "Una capa delgada de peptidoglicano que no retiene el cristal violeta.",
+              "La ausencia de proteínas fijadoras de penicilina."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "Un microorganismo aislado no retiene el cristal violeta durante la tinción de Gram. ¿Qué estructura celular contribuye más a este resultado?",
+            "options": [
+              "La membrana citoplásmica sin peptidoglicano.",
+              "Una capa delgada de peptidoglicano y la membrana externa.",
+              "La presencia de ácido teicoico en su pared celular.",
+              "Una membrana plasmática reforzada por proteínas."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Por qué las bacterias Gramnegativas son más flexibles que las Grampositivas?",
+            "answer": "Porque tienen una capa delgada de peptidoglicano y una membrana externa que permite mayor flexibilidad estructural."
+          },
+          {
+            "question": "¿Qué determina que las bacterias Grampositivas retengan el cristal violeta durante la tinción de Gram?",
+            "answer": "Su gruesa capa de peptidoglicano, que atrapa el colorante incluso después del tratamiento con alcohol."
+          },
+          {
+            "question": "¿Cómo afecta la disposición del peptidoglicano la resistencia osmótica en Grampositivas y Gramnegativas?",
+            "answer": "Las Grampositivas son más resistentes a daños osmóticos gracias a su gruesa capa de peptidoglicano, mientras que las Gramnegativas tienen menor resistencia."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_3",
+        "content": `<h2>Ácidos teicoico y lipoteicoico en bacterias Grampositivas</h2><p>En las bacterias <strong>Grampositivas</strong>, ciertos polímeros únicos, como el <strong>ácido teicoico</strong> y el <strong>ácido lipoteicoico</strong>, desempeñan funciones especializadas. El ácido teicoico, anclado en la pared celular, facilita la adhesión bacteriana a superficies, mientras que el ácido lipoteicoico, que está integrado en la membrana citoplásmica, contribuye a la interacción con el sistema inmunitario del huésped y a la estabilidad estructural. Estos componentes no solo refuerzan la pared celular, sino que también median en procesos clave como la colonización y la evasión inmune.</p>`,
+        "questions": [
+          {
+            "text": "¿Cuál es la función principal del ácido teicoico en las bacterias Grampositivas?",
+            "options": [
+              "Proveer flexibilidad estructural a la membrana externa.",
+              "Facilitar la adhesión bacteriana a superficies.",
+              "Actuar como receptor de antibióticos β-lactámicos.",
+              "Estimular la síntesis de peptidoglicano."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Qué componente de las bacterias Grampositivas está integrado en la membrana citoplásmica y contribuye a la interacción con el sistema inmunitario del huésped?",
+            "options": [
+              "Ácido teicoico.",
+              "Peptidoglicano.",
+              "Ácido lipoteicoico.",
+              "Lipopolisacárido."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "Un investigador estudia una cepa bacteriana Grampositiva que muestra mayor capacidad de colonización en tejidos del huésped. ¿Qué componente es más probable que esté involucrado en este proceso?",
+            "options": [
+              "Peptidoglicano.",
+              "Ácido teicoico.",
+              "Ácido lipoteicoico.",
+              "Proteínas fijadoras de penicilina."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué componente exclusivo de las bacterias Grampositivas facilita la adhesión a superficies?",
+            "answer": "El ácido teicoico."
+          },
+          {
+            "question": "¿Cómo contribuye el ácido lipoteicoico a la patogénesis bacteriana?",
+            "answer": "Interacciona con el sistema inmunitario del huésped y refuerza la estabilidad estructural de la bacteria."
+          },
+          {
+            "question": "¿Cuál es una diferencia clave entre el ácido teicoico y el ácido lipoteicoico?",
+            "answer": "El ácido teicoico está anclado en la pared celular, mientras que el ácido lipoteicoico está integrado en la membrana citoplásmica."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_4",
+        "content": `<h2>Proteínas de superficie y virulencia bacteriana</h2><p>Además, las proteínas de superficie celular varían significativamente entre los diferentes géneros bacterianos, reflejando adaptaciones específicas para su entorno o patogenicidad. Por ejemplo, la <strong>M protein</strong>, característico del género <strong>Streptococcus</strong>, es una proteína multifuncional que juega un papel crucial en la virulencia. Actúa como un factor antifagocítico, interfiriendo con la opsonización y la fagocitosis mediada por neutrófilos, y también facilita la adherencia inicial a las células del huésped. Esta capacidad de evadir la respuesta inmune innata convierte a la <strong>M protein</strong> en un objetivo clave en el estudio de infecciones estreptocócicas y en el desarrollo de estrategias terapéuticas.</p>`,
+        "questions": [
+          {
+            "text": "¿Cuál es la función principal de la proteína M en las bacterias del género Streptococcus?",
+            "options": [
+              "Facilitar la síntesis de peptidoglicano.",
+              "Actuar como receptor de antibióticos β-lactámicos.",
+              "Interferir con la opsonización y la fagocitosis.",
+              "Proveer energía para el transporte activo."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "Un paciente presenta una infección por Streptococcus pyogenes. ¿Cómo contribuye la proteína M a la patogénesis en este caso?",
+            "options": [
+              "Estimula la síntesis de endotoxinas.",
+              "Facilita la adhesión inicial a las células del huésped.",
+              "Degrada componentes del sistema inmune adaptativo.",
+              "Promueve la formación de biopelículas en tejidos profundos."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Por qué la proteína M es un objetivo importante en el desarrollo de terapias contra infecciones estreptocócicas?",
+            "options": [
+              "Porque inhibe la replicación bacteriana.",
+              "Porque suple los nutrientes esenciales de la bacteria.",
+              "Porque desempeña un papel clave en la evasión inmune.",
+              "Porque facilita la formación de cápsulas bacterianas."
+            ],
+            "correctIndex": 2
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué género bacteriano se caracteriza por la presencia de la proteína M?",
+            "answer": "Streptococcus."
+          },
+          {
+            "question": "¿Cómo actúa la proteína M como factor antifagocítico?",
+            "answer": "Interfiere con la opsonización y la fagocitosis mediada por neutrófilos."
+          },
+          {
+            "question": "¿Por qué la proteína M es crucial en la adherencia bacteriana?",
+            "answer": "Facilita la adherencia inicial a las células del huésped durante la infección."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_5",
+        "content": `<h2>Gramnegativas y el lipopolisacárido (LPS)</h2><p>Las bacterias <strong>Gramnegativas</strong> se distinguen por poseer una <strong>membrana externa</strong> que cubre la capa de <strong>peptidoglicano</strong>, otorgándoles una barrera adicional frente a agentes externos. Esta membrana no solo cumple una función estructural, sino que contiene un componente clave: el <strong>lipopolisacárido (LPS)</strong>, también conocido como endotoxina, que desempeña un papel crucial tanto en la fisiología bacteriana como en la interacción con el sistema inmunológico del huésped.</p>`,
+        "questions": [
+          {
+            "text": "¿Cuál es la función principal de la membrana externa en las bacterias Gramnegativas?",
+            "options": [
+              "Facilitar el transporte de nutrientes a través de la membrana plasmática.",
+              "Proporcionar una barrera adicional frente a agentes externos.",
+              "Incrementar la síntesis de peptidoglicano.",
+              "Neutralizar los efectos de los antibióticos β-lactámicos."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Qué componente exclusivo de la membrana externa de las bacterias Gramnegativas es responsable de su actividad endotóxica?",
+            "options": [
+              "Proteínas fijadoras de penicilina.",
+              "Ácidos teicoicos.",
+              "Lipopolisacárido (LPS).",
+              "Peptidoglicano."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "Un paciente desarrolla sepsis causada por una infección bacteriana Gramnegativa. ¿Cómo contribuye el lipopolisacárido (LPS) a esta condición?",
+            "options": [
+              "Inhibe la síntesis proteica bacteriana.",
+              "Activa una intensa respuesta inflamatoria en el huésped.",
+              "Destruye directamente las células del sistema inmunitario.",
+              "Neutraliza la fagocitosis mediada por neutrófilos."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué estructura bacteriana contiene el lipopolisacárido (LPS)?",
+            "answer": "La membrana externa de las bacterias Gramnegativas."
+          },
+          {
+            "question": "¿Por qué el LPS es conocido como endotoxina?",
+            "answer": "Porque desencadena una fuerte respuesta inflamatoria en el huésped."
+          },
+          {
+            "question": "¿Qué función estructural cumple la membrana externa de las bacterias Gramnegativas?",
+            "answer": "Proporciona una barrera adicional frente a agentes externos."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_6",
+        "content": `<h2>Lipido A y la respuesta inmune al LPS</h2><p>El <strong>LPS</strong> está compuesto por dos regiones principales: <strong>lípido A</strong> y el polisacárido. La porción tóxica, el <strong>lípido A</strong>, es responsable de desencadenar una respuesta inmune intensa al unirse a receptores específicos, como el <strong>TLR-4</strong> (receptor tipo Toll 4), presentes en macrófagos y otras células inmunitarias. Esta unión activa una cascada de señalización que culmina en la liberación de citocinas proinflamatorias, como <strong>TNF-α</strong>, <strong>IL-1β</strong> y <strong>IL-6</strong>, lo que puede resultar en inflamación localizada o en un estado de inflamación sistémica durante infecciones severas.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué componente del LPS es responsable de su toxicidad?",
+            "options": [
+              "El polisacárido O.",
+              "El núcleo polisacárido.",
+              "El lípido A.",
+              "Las porinas de la membrana externa."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "¿Qué receptor inmunológico reconoce el LPS y desencadena una respuesta inflamatoria?",
+            "options": [
+              "TLR-4 (receptor tipo Toll 4).",
+              "CD8.",
+              "MHC de clase II.",
+              "IL-10R."
+            ],
+            "correctIndex": 0
+          },
+          {
+            "text": "Un paciente con septicemia por una bacteria Gramnegativa desarrolla un cuadro de inflamación sistémica severa. ¿Qué citocinas proinflamatorias están más asociadas con este proceso?",
+            "options": [
+              "IL-10, IL-4 y TGF-β.",
+              "TNF-α, IL-1β e IL-6.",
+              "IL-8, IL-12 y GM-CSF.",
+              "IFN-γ, IL-17 y IL-22."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué receptor específico reconoce el lípido A del LPS?",
+            "answer": "El receptor tipo Toll 4 (TLR-4)."
+          },
+          {
+            "question": "¿Qué efecto tiene la unión del lípido A al TLR-4?",
+            "answer": "Activa una cascada de señalización que libera citocinas proinflamatorias como TNF-α, IL-1β e IL-6."
+          },
+          {
+            "question": "¿Cómo puede el lípido A contribuir a la inflamación sistémica en infecciones severas?",
+            "answer": "Induce una respuesta inmune excesiva al estimular la liberación de citocinas proinflamatorias."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_7",
+        "content": `<h2>Activación inmune policlonal por LPS</h2><p>Además de su interacción con el sistema inmune innato, el <strong>LPS</strong> tiene la capacidad de activar de manera no específica a los <strong>linfocitos B</strong>, incluso sin la participación de los <strong>linfocitos T</strong>. Este tipo de activación policlonal genera una respuesta de anticuerpos masiva, aunque menos específica, dificultando una defensa dirigida del huésped. Este mecanismo es una estrategia bacteriana para provocar una respuesta inmune generalizada que puede ser menos efectiva para erradicar la infección.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué célula del sistema inmunitario es activada de manera no específica por el LPS?",
+            "options": [
+              "Linfocitos T.",
+              "Macrófagos.",
+              "Linfocitos B.",
+              "Células dendríticas."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "¿Cuál es la característica principal de la activación de linfocitos B inducida por el LPS?",
+            "options": [
+              "Es dependiente de linfocitos T.",
+              "Genera una respuesta de anticuerpos policlonal y menos específica.",
+              "Inhibe la producción de anticuerpos específicos.",
+              "Genera tolerancia inmune en el huésped."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Por qué la activación policlonal inducida por LPS puede ser menos efectiva para erradicar infecciones bacterianas?",
+            "options": [
+              "Porque genera tolerancia inmune en los linfocitos B.",
+              "Porque la respuesta inmune es generalizada y carece de especificidad.",
+              "Porque bloquea la presentación de antígenos a los linfocitos T.",
+              "Porque inhibe la producción de citocinas proinflamatorias."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué célula inmune activa el LPS de forma policlonal?",
+            "answer": "Los linfocitos B."
+          },
+          {
+            "question": "¿Qué tipo de respuesta de anticuerpos genera el LPS?",
+            "answer": "Una respuesta policlonal masiva, pero menos específica."
+          },
+          {
+            "question": "¿Cómo afecta la activación policlonal por LPS la eficacia de la respuesta inmune?",
+            "answer": "Reduce la especificidad de los anticuerpos, dificultando la eliminación dirigida de la bacteria."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_8",
+        "content": `<h2>Antígeno O y serotipificación bacteriana</h2><p>Por último, el <strong>LPS</strong> también tiene un papel fundamental en la clasificación bacteriana a través de la serotipificación. La porción polisacárida externa, conocida como <strong>antígeno O</strong>, presenta una alta variabilidad estructural entre diferentes especies y cepas bacterianas. Esta diversidad permite la identificación precisa de cepas específicas y refleja una adaptación evolutiva que facilita la evasión del reconocimiento inmunitario, al cambiar continuamente su “perfil molecular” para evitar la detección por parte del sistema inmune.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué componente del LPS se utiliza para la serotipificación bacteriana?",
+            "options": [
+              "El lípido A.",
+              "El núcleo polisacárido.",
+              "El antígeno O.",
+              "La membrana externa."
+            ],
+            "correctIndex": 2
+          },
+          {
+            "text": "¿Cómo contribuye la variabilidad del antígeno O a la patogénesis bacteriana?",
+            "options": [
+              "Incrementa la síntesis de peptidoglicano.",
+              "Facilita la evasión del reconocimiento inmunitario.",
+              "Mejora la adhesión a las células del huésped.",
+              "Activa linfocitos T de manera inespecífica."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "Un laboratorio realiza una serotipificación para identificar la cepa específica de una bacteria Gramnegativa. ¿Qué región del LPS permite esta clasificación?",
+            "options": [
+              "Lípido A, por su conservación en todas las bacterias Gramnegativas.",
+              "Núcleo polisacárido, debido a su variabilidad estructural.",
+              "Antígeno O, por su alta diversidad estructural entre cepas.",
+              "Membrana citoplásmica, por sus proteínas específicas."
+            ],
+            "correctIndex": 2
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué parte del LPS es clave para la serotipificación bacteriana?",
+            "answer": "El antígeno O."
+          },
+          {
+            "question": "¿Cómo ayuda el antígeno O a las bacterias a evadir el sistema inmunitario?",
+            "answer": "Cambia continuamente su estructura para evitar el reconocimiento inmunitario."
+          },
+          {
+            "question": "¿Por qué es útil el antígeno O en la identificación de cepas bacterianas?",
+            "answer": "Su alta variabilidad estructural permite clasificar especies y cepas específicas."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_9",
+        "content": `<h2>Peptidoglicano: estructura y función</h2><p>El <strong>peptidoglicano</strong> es un polímero esencial que forma la base estructural de la pared celular bacteriana. Está compuesto por cadenas polisacáridas de <strong>N-acetilglucosamina (GlcNAc, NAG)</strong> y <strong>N-acetilmurámico (MurNAc, NAM)</strong>, enlazadas mediante puentes peptídicos. Este entrecruzamiento confiere al peptidoglicano su rigidez y resistencia, características esenciales para soportar la presión osmótica y mantener la integridad celular. Una analogía útil sería imaginar el peptidoglicano como una malla de acero reforzada: los eslabones representan las cadenas de NAG y NAM, mientras que los remaches que unen los eslabones son los enlaces peptídicos.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué componentes forman las cadenas polisacáridas del peptidoglicano?",
+            "options": [
+              "Glucosa y N-acetilglucosamina (NAG).",
+              "Ácido murámico (NAM) y N-acetilglucosamina (NAG).",
+              "N-acetilglucosamina (NAG) y ácido teicoico.",
+              "Ácido murámico (NAM) y lipopolisacáridos (LPS)."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Qué papel desempeñan los enlaces peptídicos en la estructura del peptidoglicano?",
+            "options": [
+              "Proporcionan flexibilidad para adaptarse a cambios osmóticos.",
+              "Permiten la resistencia estructural al entrecruzar las cadenas de NAG y NAM.",
+              "Facilitan la adhesión bacteriana a superficies.",
+              "Actúan como receptores para antibióticos β-lactámicos."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "Un investigador compara el peptidoglicano con una malla de acero reforzada. ¿Qué estructura bacteriana corresponde a los \"remaches\" en esta analogía?",
+            "options": [
+              "Las cadenas polisacáridas de NAG y NAM.",
+              "Los enlaces peptídicos entre las cadenas.",
+              "El lípido A de la membrana externa.",
+              "El ácido teicoico en bacterias Grampositivas."
+            ],
+            "correctIndex": 1
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué dos moléculas forman las cadenas principales del peptidoglicano?",
+            "answer": "N-acetilglucosamina (NAG) y N-acetilmurámico (NAM)."
+          },
+          {
+            "question": "¿Cómo contribuyen los enlaces peptídicos a la estructura del peptidoglicano?",
+            "answer": "Entrecruzan las cadenas de NAG y NAM, proporcionando rigidez y resistencia."
+          },
+          {
+            "question": "¿Por qué el peptidoglicano es esencial para las bacterias?",
+            "answer": "Soporta la presión osmótica y mantiene la integridad celular."
+          }
+        ]
+      },
+      {
+        "id": "micro_bacterias_10",
+        "content": `<h2>Tetrapéptidos del peptidoglicano: diversidad y función</h2><p>El enlace peptídico en sí es un <strong>tetrapéptido</strong>, aunque se origina como un <strong>pentapéptido</strong> durante su síntesis. Este pentapéptido incluye una serie de aminoácidos específicos, pero durante la formación del enlace cruzado, el aminoácido terminal <strong>D-alanina</strong> es liberado, resultando en un tetrapéptido final. Los dos primeros aminoácidos del tetrapéptido pueden variar entre diferentes especies bacterianas, lo que aporta diversidad estructural y funcional. El tercer aminoácido, sin embargo, debe contener un grupo amina (por ejemplo, <strong>L-lisina</strong>, <strong>ácido diaminopimélico</strong> o <strong>ácido diaminobutírico</strong>), ya que este grupo es fundamental para formar un enlace cruzado con el cuarto aminoácido (<strong>D-alanina</strong>) de otra cadena peptídica. Este diseño asegura que la red de peptidoglicano sea tanto fuerte como flexible, permitiendo cierta elasticidad sin comprometer la integridad.</p>`,
+        "questions": [
+          {
+            "text": "¿Qué ocurre durante la formación del enlace cruzado en el peptidoglicano?",
+            "options": [
+              "El tetrapéptido pierde su primer aminoácido.",
+              "El aminoácido terminal D-alanina es liberado.",
+              "Se añade un sexto aminoácido para reforzar la red.",
+              "El pentapéptido se convierte en un tripéptido."
+            ],
+            "correctIndex": 1
+          },
+          {
+            "text": "¿Qué característica debe tener el tercer aminoácido del tetrapéptido en el peptidoglicano?",
+            "options": [
+              "Contener un grupo amina para formar el enlace cruzado.",
+              "Ser un aminoácido aromático para estabilizar la estructura.",
+              "Estar presente como D-alanina.",
+              "Proveer carga negativa para la interacción con NAG y NAM."
+            ],
+            "correctIndex": 0
+          },
+          {
+            "text": "¿Cómo contribuye la variabilidad de los dos primeros aminoácidos del tetrapéptido a la estructura del peptidoglicano?",
+            "options": [
+              "Introduce diversidad funcional entre diferentes especies bacterianas.",
+              "Refuerza la unión con los lipopolisacáridos.",
+              "Incrementa la resistencia al ataque por β-lactámicos.",
+              "Facilita la degradación del peptidoglicano durante la replicación celular."
+            ],
+            "correctIndex": 0
+          }
+        ],
+        "flashcards": [
+          {
+            "question": "¿Qué aminoácido es liberado durante la formación del enlace cruzado en el peptidoglicano?",
+            "answer": "D-alanina."
+          },
+          {
+            "question": "¿Qué tipo de grupo debe contener el tercer aminoácido del tetrapéptido para formar enlaces cruzados?",
+            "answer": "Un grupo amina."
+          },
+          {
+            "question": "¿Cómo afecta la variabilidad en los dos primeros aminoácidos del tetrapéptido a las bacterias?",
+            "answer": "Confiere diversidad estructural y funcional entre diferentes especies bacterianas."
+          }
+        ]
+      }
+    ]
+  },
+
+		      "Física": { // Asignatura
+		        "Mecánica": [ // Temática
+		          {
+		            id: "fisi_mec_1", // Identificador único de la diapositiva
+		            content: `<h2>Movimiento Rectilíneo Uniforme (MRU)</h2>
+		                      <p>El Movimiento **Rectilíneo Uniforme (MRU)** describe el desplazamiento de un **objeto que se mueve** en línea recta con una velocidad constante.</p>`,
+		            questions: [ // Arreglo de preguntas
+		              {
+		                text: "¿Qué define el Movimiento Rectilíneo Uniforme (MRU)?",
+		                options: [
+		                  "Aceleración constante",
+		                  "Velocidad variable",
+		                  "Velocidad constante",
+		                  "Movimiento en círculo"
+		                ],
+		                correctIndex: 2 // Índice de la respuesta correcta (0-based)
+		              },
+		              {
+		                text: "¿Cuál es la fórmula del Movimiento Rectilíneo Uniforme?",
+		                options: [
+		                  "v = d/t",
+		                  "v = u + at",
+		                  "s = ut + ½ at²",
+		                  "F = ma"
+		                ],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "Si un objeto se mueve a 10 m/s, ¿qué sucede con su velocidad en MRU?",
+		                options: [
+		                  "Aumenta",
+		                  "Disminuye",
+		                  "Permanece constante",
+		                  "No se puede determinar"
+		                ],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Qué representa 'd' en la fórmula v = d/t?",
+		                options: [
+		                  "Distancia",
+		                  "Tiempo",
+		                  "Velocidad",
+		                  "Aceleración"
+		                ],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "Un automóvil recorre 100 km en 2 horas. ¿Cuál es su velocidad?",
+		                options: [
+		                  "50 km/h",
+		                  "100 km/h",
+		                  "150 km/h",
+		                  "200 km/h"
+		                ],
+		                correctIndex: 0
+		              }
+		            ],
+		            flashcards: [ // Arreglo de flashcards
+		              {
+		                question: "Define Movimiento Rectilíneo Uniforme.",
+		                answer: "Es el movimiento de un objeto a velocidad constante en una línea recta."
+		              },
+		              {
+		                question: "¿Cuál es la fórmula para calcular la velocidad en MRU?",
+		                answer: "v = d/t, donde v es velocidad, d es distancia y t es tiempo."
+		              },
+		              {
+		                question: "¿Qué implica que la velocidad sea constante en MRU?",
+		                answer: "Que no hay aceleración; la velocidad no cambia con el tiempo."
+		              },
+		              {
+		                question: "¿Qué representa 't' en la fórmula v = d/t?",
+		                answer: "El tiempo durante el cual se recorre la distancia d."
+		              },
+		              {
+		                question: "¿Cómo se calcula la distancia recorrida en MRU?",
+		                answer: "Multiplicando la velocidad por el tiempo: d = v × t."
+		              }
+		            ]
+		          }
+		        ]
+		      },
+		
+		"Historia Alternativa": { // Asignatura
+		    "Ucronías": [ // Temática
+		        {
+		            id: "hist_alt_1", // Identificador único de la diapositiva
+		            content: `<h2>¿Qué son las Ucronías?</h2>
+		                      <p>Las ucronías son relatos o hipótesis que plantean escenarios alternativos en la historia, explorando qué habría sucedido si ciertos eventos hubieran ocurrido de manera distinta.</p>`,
+		            questions: [
+		                {
+		                    text: "¿Qué describe una ucronía?",
+		                    options: [
+		                        "Hechos históricos reales",
+		                        "Futuro cercano",
+		                        "Escenarios alternativos en la historia",
+		                        "Eventos sobrenaturales"
+		                    ],
+		                    correctIndex: 2
+		                },
+		                {
+		                    text: "¿Cuál es una característica principal de las ucronías?",
+		                    options: [
+		                        "Plantean qué habría sucedido en escenarios históricos alternativos.",
+		                        "Predicen el futuro de la humanidad.",
+		                        "Describen únicamente hechos reales.",
+		                        "Exploran exclusivamente mitos y leyendas."
+		                    ],
+		                    correctIndex: 0
+		                }
+		            ],
+		            flashcards: [
+		                {
+		                    question: "¿Qué es una ucronía?",
+		                    answer: "Es una narración que explora cómo habría cambiado la historia si ciertos eventos hubieran ocurrido de manera distinta."
+		                },
+		                {
+		                    question: "¿Cuál es un ejemplo de ucronía?",
+		                    answer: "Un escenario donde un evento histórico importante, como una guerra, tiene un resultado diferente."
+		                }
+		            ]
+		        },
+		        {
+		            id: "hist_alt_2",
+		            content: `<h2>La Segunda Guerra Mundial Alternativa</h2>
+		                      <p>Imagina que la Segunda Guerra Mundial terminó con un acuerdo de paz en 1941. ¿Cómo habría cambiado la política mundial?</p>`,
+		            questions: [
+		                {
+		                    text: "Si la Segunda Guerra Mundial hubiera terminado en 1941, ¿qué impacto inmediato se esperaría?",
+		                    options: [
+		                        "El surgimiento de un bloque único europeo",
+		                        "Una expansión más rápida de la Guerra Fría",
+		                        "Un auge económico inmediato",
+		                        "La continua influencia de los imperios coloniales"
+		                    ],
+		                    correctIndex: 3
+		                },
+		                {
+		                    text: "¿Qué áreas podrían haber cambiado más con una Segunda Guerra Mundial más corta?",
+		                    options: [
+		                        "La tecnología y los derechos humanos",
+		                        "El comercio global",
+		                        "La exploración espacial",
+		                        "Todas las anteriores"
+		                    ],
+		                    correctIndex: 3
+		                }
+		            ],
+		            flashcards: [
+		                {
+		                    question: "¿Qué podría haber cambiado si la Segunda Guerra Mundial terminaba en 1941?",
+		                    answer: "La permanencia de los imperios coloniales habría sido más fuerte y el mapa geopolítico mundial sería muy diferente."
+		                },
+		                {
+		                    question: "¿Qué impacto tendría en la tecnología?",
+		                    answer: "Un desarrollo más lento de tecnologías bélicas como los cohetes y la energía nuclear."
+		                }
+		            ]
+		        },
+		        {
+		            id: "hist_alt_3",
+		            content: `<h2>La Revolución Industrial en Asia</h2>
+		                      <p>Imagina que la Revolución Industrial comenzó en China en lugar de Europa. ¿Cómo sería el mundo hoy?</p>`,
+		            questions: [
+		                {
+		                    text: "Si la Revolución Industrial hubiera iniciado en Asia, ¿qué región habría liderado la economía global?",
+		                    options: [
+		                        "Europa",
+		                        "Asia",
+		                        "América",
+		                        "África"
+		                    ],
+		                    correctIndex: 1
+		                },
+		                {
+		                    text: "¿Cómo habría afectado esto las relaciones internacionales del siglo XIX?",
+		                    options: [
+		                        "Europa habría sido más poderosa",
+		                        "Asia habría dominado el comercio global",
+		                        "América habría liderado antes",
+		                        "África habría sido más independiente"
+		                    ],
+		                    correctIndex: 1
+		                }
+		            ],
+		            flashcards: [
+		                {
+		                    question: "¿Cómo sería el mundo si la Revolución Industrial comenzara en Asia?",
+		                    answer: "Asia habría dominado los avances tecnológicos y económicos desde el siglo XVIII."
+		                },
+		                {
+		                    question: "¿Qué impacto tendría esto en el comercio global?",
+		                    answer: "China e India habrían liderado el comercio y la tecnología, cambiando el equilibrio de poder."
+		                }
+		            ]
+		        },
+		        {
+		            id: "hist_alt_4",
+		            content: `<h2>El Descubrimiento de América por los Vikingos</h2>
+		                      <p>Los vikingos llegaron a América siglos antes que Colón. ¿Qué habría pasado si hubieran colonizado extensivamente el continente?</p>`,
+		            questions: [
+		                {
+		                    text: "Si los vikingos hubieran colonizado América, ¿qué cambio cultural significativo habría ocurrido?",
+		                    options: [
+		                        "El cristianismo habría llegado más rápido",
+		                        "Europa no habría explorado América",
+		                        "Las lenguas germánicas habrían influido más en América",
+		                        "América se habría mantenido aislada"
+		                    ],
+		                    correctIndex: 2
+		                },
+		                {
+		                    text: "¿Qué impacto habría tenido en Europa una colonización vikinga de América?",
+		                    options: [
+		                        "Menor competencia por recursos",
+		                        "Un desarrollo más temprano del comercio transatlántico",
+		                        "Una conexión cultural más fuerte entre América y Escandinavia",
+		                        "Todas las anteriores"
+		                    ],
+		                    correctIndex: 3
+		                }
+		            ],
+		            flashcards: [
+		                {
+		                    question: "¿Qué habría cambiado si los vikingos colonizaban América?",
+		                    answer: "Las lenguas germánicas habrían sido predominantes y la colonización europea sería muy diferente."
+		                },
+		                {
+		                    question: "¿Qué efecto tendría en la historia europea una colonización temprana vikinga?",
+		                    answer: "Un desarrollo temprano de rutas comerciales transatlánticas y cambios en el equilibrio de poder en Europa."
+		                }
+		            ]
+		        },
+		        {
+		            id: "hist_alt_5",
+		            content: `<h2>Napoleón Conquista Rusia</h2>
+		                      <p>En un escenario alternativo, Napoleón logra conquistar Rusia. ¿Cómo cambia la historia de Europa?</p>`,
+		            questions: [
+		                {
+		                    text: "Si Napoleón conquistaba Rusia, ¿cómo habría cambiado Europa?",
+		                    options: [
+		                        "La unificación europea habría sucedido antes",
+		                        "Rusia habría dominado Europa",
+		                        "Napoleón habría consolidado un imperio global",
+		                        "Se habrían evitado las guerras posteriores"
+		                    ],
+		                    correctIndex: 0
+		                },
+		                {
+		                    text: "¿Qué país habría sido el principal opositor de un Napoleón victorioso?",
+		                    options: [
+		                        "Alemania",
+		                        "Reino Unido",
+		                        "España",
+		                        "Austria"
+		                    ],
+		                    correctIndex: 1
+		                }
+		            ],
+		            flashcards: [
+		                {
+		                    question: "¿Qué habría logrado Napoleón si conquistaba Rusia?",
+		                    answer: "Podría haber consolidado una Europa unificada bajo su mando."
+		                },
+		                {
+		                    question: "¿Qué impacto habría tenido en el Reino Unido?",
+		                    answer: "El Reino Unido habría aumentado su oposición como la última gran potencia contra Napoleón."
+		                }
+		            ]
+		        }
+		    ]
+		},
+		
+		      "Matemáticas": {
+		        "Álgebra": [
+		          {
+		            id: "mat_algebra_1",
+		            content: `<h2>Álgebra Básica</h2><p>Introducción a variables y ecuaciones.</p>`,
+		            questions: [
+		              {
+		                text: "¿Cuál de estas opciones describe mejor la variable 'x' en una ecuación?",
+		                options: [
+		                  "Una constante fija",
+		                  "Un valor desconocido",
+		                  "Una operación matemática",
+		                  "Un número siempre positivo"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cuál es el resultado de resolver 2x = 6?",
+		                options: ["x = 2", "x = 3", "x = 4", "x = 5"],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Qué operación se realiza para despejar la variable 'x' en la ecuación 5x + 10 = 0?",
+		                options: ["Sumar 10 a ambos lados", "Restar 10 a ambos lados", "Multiplicar por 5", "Dividir por 10"],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es una variable?", answer: "Símbolo que representa un valor desconocido o cambiable." },
+		              { question: "¿Qué es una ecuación?", answer: "Relación que indica igualdad entre expresiones." },
+		              { question: "¿Cómo se resuelve una ecuación lineal básica?", answer: "Despejando la variable mediante operaciones inversas." }
+		            ]
+		          },
+		          {
+		            id: "mat_algebra_2",
+		            content: `<h2>Ecuaciones Lineales</h2><p>Se resuelven despejando la variable.</p>`,
+		            questions: [
+		              {
+		                text: "¿Cuántas soluciones tiene una ecuación lineal típica en una variable?",
+		                options: ["Ninguna", "Una", "Dos", "Infinitas"],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "Si 3x = 15, entonces x = ...",
+		                options: ["3", "4", "5", "10"],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Cuál es la forma general de una ecuación lineal?",
+		                options: [
+		                  "ax² + bx + c = 0",
+		                  "ax + b = 0",
+		                  "ax³ + bx² + cx + d = 0",
+		                  "a/b = c/d"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Cómo se resuelve 2x = 10?", answer: "x = 5" },
+		              { question: "¿Qué es la forma general de la ecuación lineal?", answer: "ax + b = 0" },
+		              { question: "¿Qué representa 'a' en la ecuación lineal ax + b = 0?", answer: "La pendiente de la línea." }
+		            ]
+		          }
+		        ],
+		        "Geometría": [
+		          {
+		            id: "mat_geo_1",
+		            content: `<h2>Geometría Euclidiana</h2><p>Se basa en los postulados de Euclides.</p>`,
+		            questions: [
+		              {
+		                text: "¿Cuál es el postulado básico de la geometría euclidiana?",
+		                options: [
+		                  "El espacio es curvo",
+		                  "Las líneas paralelas no se intersectan",
+		                  "Toda curva es una recta",
+		                  "Cada triángulo tiene 4 lados"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cuántos grados tiene la suma de los ángulos internos de un triángulo?",
+		                options: ["90°", "180°", "270°", "360°"],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cómo se llama una figura con tres lados?",
+		                options: ["Cuadrado", "Rectángulo", "Triángulo", "Pentágono"],
+		                correctIndex: 2
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es un punto?", answer: "Entidad geométrica sin dimensión." },
+		              { question: "¿Qué es una línea?", answer: "Conjunto infinito de puntos alineados en una sola dirección." },
+		              { question: "¿Qué es un ángulo recto?", answer: "Ángulo de 90 grados." }
+		            ]
+		          },
+		          {
+		            id: "mat_geo_2",
+		            content: `<h2>Teorema de Pitágoras</h2><p>Relaciona los lados de un triángulo rectángulo.</p>`,
+		            questions: [
+		              {
+		                text: "¿En qué tipo de triángulo se aplica el teorema de Pitágoras?",
+		                options: ["Triángulo equilátero", "Triángulo isósceles", "Triángulo rectángulo", "Triángulo escaleno"],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "Si un triángulo rectángulo tiene catetos de 3 y 4, ¿cuál es la longitud de la hipotenusa?",
+		                options: ["5", "6", "7", "8"],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "¿Cuál es la fórmula del teorema de Pitágoras?",
+		                options: [
+		                  "a² + b² = c²",
+		                  "a + b = c",
+		                  "a² - b² = c²",
+		                  "2a + 2b = c"
+		                ],
+		                correctIndex: 0
+		              }
+		            ],
+		            flashcards: [
+		              { question: "Define hipotenusa.", answer: "El lado más largo de un triángulo rectángulo, opuesto al ángulo recto." },
+		              { question: "¿Cuál es la relación entre los lados en el teorema de Pitágoras?", answer: "El cuadrado de la hipotenusa es igual a la suma de los cuadrados de los catetos." },
+		              { question: "¿Cómo se usa el teorema de Pitágoras para encontrar un lado desconocido?", answer: "Despejando el lado desconocido en la fórmula a² + b² = c²." }
+		            ]
+		          }
+		        ]
+		      },
+		      "Historia": {
+		        "Edad Media": [
+		          {
+		            id: "his_edad_1",
+		            content: `<h2>Feudalismo</h2><p>Sistema político y económico de la Edad Media.</p>`,
+		            questions: [
+		              {
+		                text: "¿Quiénes eran los señores feudales?",
+		                options: [
+		                  "Trabajadores agrícolas",
+		                  "Monarcas absolutos",
+		                  "Nobles dueños de tierras",
+		                  "Sacerdotes"
+		                ],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Qué es un feudo?",
+		                options: [
+		                  "Una forma de gobierno",
+		                  "Un territorio administrado por un señor feudal",
+		                  "Un tipo de moneda medieval",
+		                  "Un edificio religioso"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cuál era el papel de los campesinos en el feudalismo?",
+		                options: [
+		                  "Gobernar tierras",
+		                  "Trabajar las tierras de los señores feudales",
+		                  "Liderar ejércitos",
+		                  "Enseñar en las escuelas"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es la servidumbre?", answer: "Estado de los campesinos que trabajaban para los señores feudales sin derechos." },
+		              { question: "Define señor feudal.", answer: "Noble que poseía tierras y tenía vasallos a su servicio." },
+		              { question: "¿Qué era un castillo en la Edad Media?", answer: "Fortaleza que servía como residencia y defensa de un señor feudal." }
+		            ]
+		          },
+		          {
+		            id: "his_edad_2",
+		            content: `<h2>Las Cruzadas</h2><p>Guerras religiosas entre cristianos y musulmanes.</p>`,
+		            questions: [
+		              {
+		                text: "¿Cuál fue el objetivo principal de las Cruzadas?",
+		                options: [
+		                  "Expandir territorios europeos",
+		                  "Recuperar Tierra Santa para el cristianismo",
+		                  "Establecer rutas comerciales",
+		                  "Conquistar el Imperio Bizantino"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿En qué siglo comenzó la primera Cruzada?",
+		                options: ["10º", "11º", "12º", "13º"],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Qué evento inspiró el inicio de las Cruzadas?",
+		                options: [
+		                  "La caída de Constantinopla",
+		                  "La publicación de la Carta Magna",
+		                  "La llamada del Papa Urbano II",
+		                  "El descubrimiento de América"
+		                ],
+		                correctIndex: 2
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué era el Caballero Templario?", answer: "Orden militar y religiosa que participó en las Cruzadas." },
+		              { question: "Define Tierra Santa.", answer: "Región sagrada para cristianos, judíos y musulmanes, principalmente Jerusalén." },
+		              { question: "¿Cuántas Cruzadas hubo aproximadamente?", answer: "Ocho principales entre los siglos XI y XIII." }
+		            ]
+		          }
+		        ],
+		        "Revolución Industrial": [
+		          {
+		            id: "his_rev_ind_1",
+		            content: `<h2>Inicio de la Revolución Industrial</h2><p>Transformación económica y social en el siglo XVIII.</p>`,
+		            questions: [
+		              {
+		                text: "¿En qué país comenzó la Revolución Industrial?",
+		                options: ["Estados Unidos", "Alemania", "Inglaterra", "Francia"],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Cuál fue una de las principales innovaciones de la Revolución Industrial?",
+		                options: [
+		                  "La imprenta",
+		                  "La máquina de vapor",
+		                  "El telar manual",
+		                  "La bicicleta"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Qué sector económico se expandió significativamente durante la Revolución Industrial?",
+		                options: [
+		                  "Agricultura",
+		                  "Manufactura",
+		                  "Comercio marítimo",
+		                  "Servicios financieros"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es la mecanización?", answer: "Proceso de utilizar maquinaria para aumentar la producción." },
+		              { question: "Define urbanización.", answer: "Crecimiento de las ciudades debido a la migración desde áreas rurales." },
+		              { question: "¿Qué impacto tuvo la Revolución Industrial en la sociedad?", answer: "Cambios en las condiciones laborales, urbanización y desarrollo tecnológico." }
+		            ]
+		          },
+		          {
+		            id: "his_rev_ind_2",
+		            content: `<h2>Consecuencias de la Revolución Industrial</h2><p>Cambios sociales, económicos y ambientales.</p>`,
+		            questions: [
+		              {
+		                text: "¿Cuál fue un efecto social de la Revolución Industrial?",
+		                options: [
+		                  "Disminución de la población urbana",
+		                  "Mejora inmediata de las condiciones laborales",
+		                  "Aumento de la clase obrera",
+		                  "Reducción de la inmigración"
+		                ],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Cómo afectó la Revolución Industrial al medio ambiente?",
+		                options: [
+		                  "Mejoró la calidad del aire",
+		                  "Redujo la contaminación",
+		                  "Aumentó la contaminación y uso de recursos naturales",
+		                  "No tuvo impacto ambiental"
+		                ],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Qué movimiento surgió como respuesta a las condiciones laborales de la Revolución Industrial?",
+		                options: [
+		                  "Movimiento Romántico",
+		                  "Movimiento Obrero",
+		                  "Movimiento de Independencia",
+		                  "Movimiento Renacentista"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es el capitalismo industrial?", answer: "Sistema económico basado en la propiedad privada y la producción industrial." },
+		              { question: "Define sindicalismo.", answer: "Movimiento para organizar a los trabajadores y mejorar sus condiciones laborales." },
+		              { question: "¿Qué fue la Luddism?", answer: "Movimiento de trabajadores que protestaron contra las máquinas que reemplazaban su trabajo." }
+		            ]
+		          }
+		        ]
+		      },
+		      "Ciencias": {
+		        "Biología": [
+		          {
+		            id: "cien_bio_1",
+		            content: `<h2>Teoría Celular</h2><p>Principios básicos de la estructura y función celular.</p>`,
+		            questions: [
+		              {
+		                text: "¿Quiénes son los principales proponentes de la teoría celular?",
+		                options: [
+		                  "Charles Darwin y Alfred Russel Wallace",
+		                  "Robert Hooke y Matthias Schleiden",
+		                  "Isaac Newton y Galileo Galilei",
+		                  "Louis Pasteur y Gregor Mendel"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cuál es el principio fundamental de la teoría celular?",
+		                options: [
+		                  "Todos los organismos están compuestos de una sola célula",
+		                  "La célula es la unidad básica de la vida",
+		                  "Las células pueden surgir de materia inanimada",
+		                  "Las células no tienen núcleo"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Qué diferencia a una célula procariota de una eucariota?",
+		                options: [
+		                  "Las procariotas tienen núcleo definido",
+		                  "Las eucariotas no tienen orgánulos",
+		                  "Las procariotas son más grandes",
+		                  "Las eucariotas tienen núcleo definido y orgánulos"
+		                ],
+		                correctIndex: 3
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es una célula?", answer: "La unidad básica de la vida que constituye los organismos vivos." },
+		              { question: "¿Qué es un orgánulo celular?", answer: "Estructuras especializadas dentro de una célula que realizan funciones específicas." },
+		              { question: "¿Qué orgánulo es responsable de la producción de energía en la célula?", answer: "Mitocondria." }
+		            ]
+		          },
+		          {
+		            id: "cien_bio_2",
+		            content: `<h2>Genética</h2><p>Estudio de la herencia y la variación genética.</p>`,
+		            questions: [
+		              {
+		                text: "¿Quién es conocido como el padre de la genética?",
+		                options: [
+		                  "Charles Darwin",
+		                  "Gregor Mendel",
+		                  "Louis Pasteur",
+		                  "James Watson"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Qué es un gen?",
+		                options: [
+		                  "Una unidad básica de heredabilidad",
+		                  "Una célula especializada",
+		                  "Un orgánulo dentro de la célula",
+		                  "Un tipo de tejido"
+		                ],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "¿Qué describe la Ley de Segregación de Mendel?",
+		                options: [
+		                  "Los caracteres dominantes siempre se expresan",
+		                  "Los alelos se separan durante la formación de gametos",
+		                  "Los caracteres están ligados al sexo",
+		                  "Los genes se combinan de forma independiente"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es un alelo?", answer: "Variación de un gen que determina un rasgo específico." },
+		              { question: "Define dominancia en genética.", answer: "Cuando un alelo enmascara la expresión de otro alelo." },
+		              { question: "¿Qué es un fenotipo?", answer: "Características observables de un organismo resultantes de la interacción de su genotipo con el ambiente." }
+		            ]
+		          }
+		        ],
+		        "Química": [
+		          {
+		            id: "cien_quim_1",
+		            content: `<h2>Tabla Periódica</h2><p>Estructura y organización de los elementos químicos.</p>`,
+		            questions: [
+		              {
+		                text: "¿Quién desarrolló la primera versión de la tabla periódica?",
+		                options: [
+		                  "Dmitri Mendeléyev",
+		                  "Isaac Newton",
+		                  "Albert Einstein",
+		                  "Marie Curie"
+		                ],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "¿Qué representa el número atómico en la tabla periódica?",
+		                options: [
+		                  "El número de neutrones",
+		                  "El número de protones",
+		                  "El número de electrones",
+		                  "La masa del átomo"
+		                ],
+		                correctIndex: 1
+		              },
+		              {
+		                text: "¿Cómo se agrupan los elementos en la tabla periódica?",
+		                options: [
+		                  "Por su masa",
+		                  "Por su número atómico",
+		                  "Por su color",
+		                  "Por su estado físico"
+		                ],
+		                correctIndex: 1
+		              }
+		            ],
+		            flashcards: [
+		              { question: "¿Qué es un grupo en la tabla periódica?", answer: "Columna vertical que agrupa elementos con propiedades químicas similares." },
+		              { question: "Define periodo en la tabla periódica.", answer: "Fila horizontal que indica el nivel de energía de los electrones." },
+		              { question: "¿Qué son los metales alcalinos?", answer: "Elementos del grupo 1 de la tabla periódica, altamente reactivos." }
+		            ]
+		          },
+		          {
+		            id: "cien_quim_2",
+		            content: `<h2>Reacciones Químicas</h2><p>Tipos y mecanismos de las reacciones químicas.</p>`,
+		            questions: [
+		              {
+		                text: "¿Qué indica una flecha en una ecuación química?",
+		                options: [
+		                  "El cambio de color",
+		                  "El equilibrio de la reacción",
+		                  "La dirección de la reacción",
+		                  "La energía de activación"
+		                ],
+		                correctIndex: 2
+		              },
+		              {
+		                text: "¿Cuál es el producto principal de la combustión completa del metano?",
+		                options: [
+		                  "Dióxido de carbono y agua",
+		                  "Monóxido de carbono y agua",
+		                  "Dióxido de carbono y oxígeno",
+		                  "Hidrógeno y agua"
+		                ],
+		                correctIndex: 0
+		              },
+		              {
+		                text: "¿Qué tipo de reacción es la siguiente: 2H₂ + O₂ → 2H₂O?",
+		                options: [
+		                  "Síntesis",
+		                  "Descomposición",
+		                  "Desplazamiento",
+		                  "Reducción-oxidación"
+		                ],
+		                correctIndex: 0
+		              }
+		            ],
+		            flashcards: [
+		              { question: "Define reactivo.", answer: "Sustancia que se consume durante una reacción química." },
+		              { question: "¿Qué es un producto en una reacción química?", answer: "Sustancia que se forma como resultado de una reacción química." },
+		              { question: "¿Qué es catalizador?", answer: "Sustancia que acelera una reacción química sin consumirse." }
+		            ]
+		          }
+		        ]
+		      }
+		    };
+		
+		    /* ---------- B. Variables Globales ---------- */
+		    let isPC = window.innerWidth >= 1280; // Para navegación condicional
+		    let currentSlides = [];
+		    let currentSlideIndex = 0;
+		
+		    // Para preguntas estilo "flashcard"
+		    let currentQuestions = [];        // Array de preguntas de la diapositiva actual
+		    let currentQuestionIndex = 0;     // Índice de la pregunta actual
+		    let currentQuestionSlideId = "";  // ID de la diapositiva a la que pertenecen esas preguntas
+		
+		    // Estructuras de LocalStorage
+		    let favorites = {};          // { asignatura: { tematica: [slideIDs] } }
+		    let notes = [];              // [{ slideId, noteText }]
+		    let repeatQuestions = [];    // [ { slideId, questionIndex }, ... ] (igual a flashcards pero para preguntas)
+		    let repeatFlashcards = [];   // [ { slideId, cardIndex }, ... ]
+		    let examResults = [];        // [{ date, total, correct }, ...]
+		    let usageStats = {
+		      slidesVisited: 0,
+		      totalQuestionsAnswered: 0,
+		      correctAnswers: 0,
+		      totalExams: 0,
+		      slidesSeenSet: []
+		    };
+		
+		    /* ---------- C. Selección de Elementos DOM ---------- */
+		    const sidebar = document.getElementById('sidebar');
+		    const toggleSidebarBtn = document.getElementById('toggleSidebar');
+		    const interfaceElements = document.querySelectorAll('.interface');
+		    const main = document.getElementById('main');
+		    const sidebarButtons = document.querySelectorAll('#sidebar ul li button');
+		
+		    /* Interfaz Subjects/Temas/Slides */
+		    const subjectsGrid = document.getElementById('subjectsGrid');
+		    const themesGrid = document.getElementById('themesGrid');
+		    const themeTitle = document.getElementById('themeTitle');
+		    const slideContainer = document.getElementById('slide-container');
+		    const prevBtn = document.getElementById('prevBtn');
+		    const nextBtn = document.getElementById('nextBtn');
+		
+		    /* Otras interfaces */
+		    const favoritesContent = document.getElementById('favoritesContent');
+		    const notesContent = document.getElementById('notesContent');
+		    const questionsContent = document.getElementById('questionsContent');
+		    const flashcardsContent = document.getElementById('flashcardsContent');
+		    const examContent = document.getElementById('examContent');
+		    const performanceContent = document.getElementById('performanceContent');
+		
+		    /* Modales para una sola Pregunta */
+		    const questionCardModal = document.getElementById('questionCardModal');
+		    const closeQuestionCardModal = document.getElementById('closeQuestionCardModal');
+		    const questionTitle = document.getElementById('questionTitle');
+		    const questionOptions = document.getElementById('questionOptions');
+		    const questionFeedback = document.getElementById('questionFeedback');
+		    const submitQuestionBtn = document.getElementById('submitQuestionBtn');
+		    const prevQuestionCardBtn = document.getElementById('prevQuestionCardBtn');
+		    const nextQuestionCardBtn = document.getElementById('nextQuestionCardBtn');
+		    const repeatQuestionCardBtn = document.getElementById('repeatQuestionCardBtn');
+		
+		    /* Modales para Flashcards */
+		    const flashcardsModal = document.getElementById('flashcardsModal');
+		    const closeFlashcardsModal = document.getElementById('closeFlashcardsModal');
+		    const flashcardBody = document.getElementById('flashcardBody');
+		    const repeatFlashcardBtn = document.getElementById('repeatFlashcardBtn');
+function loadHomeInterface() {
+  const homeGrid = document.getElementById("homeGrid");
+
+  const sections = [
+    {
+      id: "subjects",
+      title: "Asignaturas",
+      description: "Explora y selecciona asignaturas.",
+      backgroundImage: "asignaturas.jpg", // Ruta de la imagen
+    },
+    {
+      id: "favorites",
+      title: "Favoritos",
+      description: "Revisa diapositivas favoritas.",
+      backgroundImage: "favoritos.jpg", // Ruta de la imagen
+    },
+    {
+      id: "notes",
+      title: "Notas",
+      description: "Consulta y organiza tus notas.",
+      backgroundImage: "notas.jpg", // Ruta de la imagen
+    },
+    {
+      id: "questionsRepeat",
+      title: "Preguntas",
+      description: "Repasa preguntas marcadas.",
+      backgroundImage: "preguntas.jpg", // Ruta de la imagen
+    },
+    {
+      id: "flashcardsRepeat",
+      title: "Flashcards",
+      description: "Estudia flashcards repetidas.",
+      backgroundImage: "flashcards.jpg", // Ruta de la imagen
+    },
+    {
+      id: "exam",
+      title: "Examen",
+      description: "Configura y realiza exámenes.",
+      backgroundImage: "examen.jpg", // Ruta de la imagen
+    },
+    {
+      id: "performance",
+      title: "Desempeño",
+      description: "Consulta estadísticas y progreso.",
+      backgroundImage: "desempeno.jpg", // Ruta de la imagen
+    },
+  ];
+
+  // Limpiar la cuadrícula antes de agregar contenido
+  homeGrid.innerHTML = "";
+
+  // Crear las tarjetas dinámicamente
+  sections.forEach((section) => {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.style.backgroundImage = `url(${section.backgroundImage})`; // Asignar imagen como fondo
+    card.style.backgroundSize = "cover"; // Ajustar imagen al tamaño de la tarjeta
+    card.style.backgroundPosition = "center"; // Centrar imagen
+    card.style.borderRadius = "8px"; // Bordes redondeados
+    card.style.color = "white"; // Texto en blanco
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)"; // Sombra para mejorar legibilidad
+  card.style.margin = "-5px"; // Ajusta el valor según sea necesario
+
+    card.innerHTML = `
+      <h3>${section.title}</h3>
+      <p>${section.description}</p>
+    `;
+    card.addEventListener("click", () => {
+      switchInterface(section.id);
+    });
+    homeGrid.appendChild(card);
+  });
+}
+
+// Función para cambiar entre interfaces
+function switchInterface(targetId) {
+  document.querySelectorAll(".interface").forEach((el) => el.classList.remove("active"));
+  document.getElementById(targetId).classList.add("active");
+}
+
+// Inicializar la interfaz de inicio
+loadHomeInterface();
+
+		
+		    /* ---------- D. Funciones de Navegación de Interfaces ---------- */
+		    function switchInterface(target) {
+		      interfaceElements.forEach(el => {
+		        if (el.id === target) {
+		          el.classList.add('active');
+		          el.classList.remove('hidden');
+		        } else {
+		          el.classList.remove('active');
+		          el.classList.add('hidden');
+		        }
+		      });
+		
+		      // Cerrar la barra lateral en pantallas pequeñas
+		      if (window.innerWidth <= 768) {
+		        sidebar.classList.add('hidden');
+		        main.classList.add('full');
+		      }
+		
+		      // Acciones específicas según la interfaz seleccionada
+		      switch(target) {
+		        case 'subjects':
+		          loadSubjects();
+		          break;
+		        case 'favorites':
+		          loadFavoritesInterface();
+		          break;
+		        case 'notes':
+		          loadNotesInterface();
+		          break;
+		        case 'questionsRepeat':
+		          loadQuestionsRepeatInterface();
+		          break;
+		        case 'flashcardsRepeat':
+		          loadFlashcardsRepeatInterface();
+		          break;
+		        case 'exam':
+		          loadExamInterface();
+		          break;
+		        case 'performance':
+		          loadPerformanceInterface();
+		          break;
+		        default:
+		          break;
+		      }
+		    }
+
+
+function showNotification(message, { background = '#000', color = 'white', duration = 3000 } = {}) {
+  const notification = Object.assign(document.createElement('div'), { 
+    textContent: message, 
+    style: `
+      position: fixed; top: 10px; right: 10px; background: ${background};
+      color: ${color}; padding: 8px 12px; border-radius: 4px; font-size: 14px;
+      z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+      transition: opacity 0.3s ease;`
+  });
+  document.body.appendChild(notification);
+  setTimeout(() => notification.style.opacity = '0', duration);
+  notification.addEventListener('transitionend', () => notification.remove(), { once: true });
+}
+		
+		    /* ---------- E. Eventos de la Barra Lateral ---------- */
+		    toggleSidebarBtn.addEventListener('click', () => {
+		      sidebar.classList.toggle('hidden');
+		      main.classList.toggle('full');
+		    });
+		
+		    sidebarButtons.forEach(btn => {
+		      btn.addEventListener('click', () => {
+		        const target = btn.getAttribute('data-interface');
+		        switchInterface(target);
+		      });
+		    });
+		
+		    /* ---------- F. Gestos Táctiles para la Barra Lateral (Opcional) ---------- */
+		    let touchStartX = 0;
+		    let touchEndX = 0;
+		
+		    document.addEventListener('touchstart', e => {
+		      touchStartX = e.changedTouches[0].screenX;
+		    });
+		
+		    document.addEventListener('touchend', e => {
+		      touchEndX = e.changedTouches[0].screenX;
+		      handleSidebarGesture();
+		    });
+		
+		    function handleSidebarGesture() {
+		      if (touchEndX < touchStartX - 50) {
+		        sidebar.classList.add('hidden');
+		        main.classList.add('full');
+		      }
+		      if (touchEndX > touchStartX + 50) {
+		        sidebar.classList.remove('hidden');
+		        main.classList.remove('full');
+		      }
+		    }
+		
+/* ---------- G. Lógica para Asignaturas y Temáticas ---------- */
+function loadSubjects() {
+  subjectsGrid.innerHTML = '';
+
+  // Crear ícono "Volver a Inicio"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Inicio"; // Agregar tooltip al ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('home'); // Regresar a la interfaz de inicio
+  });
+  subjectsGrid.appendChild(backIcon);
+
+  // Crear las tarjetas de asignaturas
+  for (let subject in data) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = subject;
+
+    // Asignar imagen de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta a asignaturas.jpg
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.fontWeight = "bold";
+    card.style.margin = "-5px";
+
+    card.addEventListener('click', () => loadThemes(subject));
+    subjectsGrid.appendChild(card);
+  }
+}
+
+function loadThemes(subject) {
+  themesGrid.innerHTML = '';
+
+  // Crear ícono "Volver a Asignaturas"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Asignaturas"; // Agregar tooltip al ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('subjects'); // Regresar a la interfaz de asignaturas
+  });
+  themesGrid.appendChild(backIcon);
+
+  themeTitle.textContent = `Temáticas de ${subject}`;
+
+  // Crear las tarjetas de temáticas
+  const themes = data[subject];
+  for (let theme in themes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = theme;
+
+    // Asignar imagen de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta a asignaturas.jpg
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+    card.style.margin = "-5px";
+
+    card.addEventListener('click', () => loadSlides(subject, theme));
+    themesGrid.appendChild(card);
+  }
+
+  switchInterface('themes');
+}
+function formatBoldText(text) {
+  // Busca texto entre asteriscos dobles y lo reemplaza con etiquetas <strong>
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+		
+		    /* ---------- H. Lógica para Diapositivas TikTok ---------- */
+		    function loadSlides(subject, theme) {
+		      slideContainer.innerHTML = '';
+		      currentSlides = data[subject][theme];
+		      currentSlideIndex = 0;
+		
+		      currentSlides.forEach((slideData, index) => {
+		        const slideDiv = document.createElement('div');
+		        slideDiv.classList.add('slide');
+		        if (index === 0) slideDiv.classList.add('active');
+slideDiv.innerHTML = formatBoldText(slideData.content);
+		
+		        // Íconos flotantes
+		        const iconsDiv = document.createElement('div');
+		        iconsDiv.classList.add('slide-icons');
+		
+// Botón Me gusta
+const likeBtn = document.createElement('button');
+likeBtn.classList.add('slide-icon-btn');
+likeBtn.textContent = "♥";
+likeBtn.title = "Me gusta";
+
+// Verificar si el slide ya está en favoritos para inicializar el color
+if (favorites[subject] && favorites[subject][theme] && favorites[subject][theme].includes(slideData.id)) {
+  likeBtn.style.color = "red"; // Marcamos el corazón como rojo si ya es favorito
+}
+
+// Agregar evento de clic
+likeBtn.addEventListener('click', () => {
+  markFavorite(subject, theme, slideData, likeBtn); // Pasamos likeBtn como argumento
+});		
+		        // Botón Comentarios
+		        const commentBtn = document.createElement('button');
+		        commentBtn.classList.add('slide-icon-btn');
+		        commentBtn.textContent = "📄";
+		        commentBtn.title = "Notas";
+		        commentBtn.addEventListener('click', () => addNote(slideData.id));
+		
+		        // Botón de Preguntas (al estilo flashcard)
+		        const questionBtn = document.createElement('button');
+		        questionBtn.classList.add('slide-icon-btn');
+		        questionBtn.textContent = "📝";
+		        questionBtn.title = "Preguntas (estilo flashcard)";
+		        questionBtn.addEventListener('click', () => openQuestionCardModal(slideData));
+		
+		        // Botón Flashcards
+		        const flashcardBtn = document.createElement('button');
+		        flashcardBtn.classList.add('slide-icon-btn');
+		        flashcardBtn.textContent = "🃏";
+		        flashcardBtn.title = "Flashcards interactivas";
+		        flashcardBtn.addEventListener('click', () => openFlashcardsModal(slideData));
+		
+		        // Agregar botones
+		        iconsDiv.appendChild(likeBtn);
+		        iconsDiv.appendChild(commentBtn);
+		        iconsDiv.appendChild(questionBtn);
+		        iconsDiv.appendChild(flashcardBtn);
+		
+		        slideDiv.appendChild(iconsDiv);
+		        slideContainer.appendChild(slideDiv);
+		      });
+		
+		      // Botones de navegación
+		      prevBtn.onclick = () => navigateSlides(-1);
+		      nextBtn.onclick = () => navigateSlides(1);
+		
+		      addSlideNavigation();
+		      switchInterface('slides');
+		    }
+		
+		    function navigateSlides(direction) {
+		      const slides = document.querySelectorAll('.slide');
+		      const total = slides.length;
+		
+		      slides[currentSlideIndex].classList.remove('active');
+		      currentSlideIndex += direction;
+		
+		      if (currentSlideIndex < 0) currentSlideIndex = 0;
+		      if (currentSlideIndex >= total) currentSlideIndex = total - 1;
+		
+		      slides.forEach((s, i) => {
+		        s.classList.remove('up', 'down', 'active');
+		        if (i < currentSlideIndex) {
+		          s.classList.add('up');
+		        } else if (i > currentSlideIndex) {
+		          s.classList.add('down');
+		        }
+		      });
+		      slides[currentSlideIndex].classList.add('active');
+		    }
+		
+		    let slideGestureHandler = null;
+		    let slideKeydownHandler = null;
+		
+		    function addSlideNavigation() {
+		      if (slideGestureHandler) {
+		        slideContainer.removeEventListener('touchstart', slideGestureHandler.touchStart);
+		        slideContainer.removeEventListener('touchend', slideGestureHandler.touchEnd);
+		        slideGestureHandler = null;
+		      }
+		      if (slideKeydownHandler) {
+		        document.removeEventListener('keydown', slideKeydownHandler);
+		        slideKeydownHandler = null;
+		      }
+		
+		      checkIfPC();
+		
+		      if (!isPC) {
+		        let touchStartY = 0;
+		        let touchEndY = 0;
+		
+		        function touchStart(e) { touchStartY = e.changedTouches[0].screenY; }
+		        function touchEnd(e) {
+		          touchEndY = e.changedTouches[0].screenY;
+		          handleSlideGesture();
+		        }
+		        function handleSlideGesture() {
+		          if (touchEndY < touchStartY - 50) navigateSlides(1); 
+		          if (touchEndY > touchStartY + 50) navigateSlides(-1);
+		        }
+		
+		        slideContainer.addEventListener('touchstart', touchStart);
+		        slideContainer.addEventListener('touchend', touchEnd);
+		        slideGestureHandler = { touchStart, touchEnd };
+		      } else {
+		        function keydownHandler(e) {
+		          if (e.key === 'ArrowUp') navigateSlides(-1);
+		          if (e.key === 'ArrowDown') navigateSlides(1);
+		        }
+		        document.addEventListener('keydown', keydownHandler);
+		        slideKeydownHandler = keydownHandler;
+		      }
+		    }
+		
+		    window.addEventListener('resize', () => {
+		      let wasPC = isPC;
+		      checkIfPC();
+		      if (wasPC !== isPC) {
+		        addSlideNavigation();
+		      }
+		    });
+		
+		    function checkIfPC() {
+		      isPC = window.innerWidth >= 1280;
+		    }
+		
+		    /* ---------- I. Lógica de Preguntas (Estilo Flashcard) ---------- */
+		    function openQuestionCardModal(slideData) {
+		      // Cargamos las preguntas de esta diapositiva
+		      currentQuestions = slideData.questions || [];
+		      currentQuestionIndex = 0;
+		      currentQuestionSlideId = slideData.id;
+		
+		      // Abrimos el modal con la primera pregunta
+		      questionCardModal.classList.add('active');
+		      renderQuestionCard();
+		    }
+		
+		    function renderQuestionCard() {
+		      questionOptions.innerHTML = '';
+		      questionFeedback.textContent = '';
+		
+		      // Control de límites
+		      if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+		      if (currentQuestionIndex >= currentQuestions.length) currentQuestionIndex = currentQuestions.length - 1;
+		
+		      const qData = currentQuestions[currentQuestionIndex];
+		      questionTitle.textContent = `Pregunta ${currentQuestionIndex + 1} de ${currentQuestions.length}: ${qData.text}`;
+		
+		      // Crear opciones
+		      qData.options.forEach((opt, idx) => {
+		        const radioDiv = document.createElement('div');
+		        const radio = document.createElement('input');
+		        radio.type = "radio";
+		        radio.name = "questionOption";
+		        radio.value = idx;
+		
+		        const label = document.createElement('label');
+		        label.textContent = " " + opt;
+		
+		        radioDiv.appendChild(radio);
+		        radioDiv.appendChild(label);
+		        questionOptions.appendChild(radioDiv);
+		      });
+		    }
+		
+// Navegación
+prevQuestionCardBtn.style.cssText = `
+  background-color: black;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+`;
+prevQuestionCardBtn.onclick = () => {
+  currentQuestionIndex--;
+  renderQuestionCard();
+};
+
+nextQuestionCardBtn.style.cssText = `
+  background-color: black;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+nextQuestionCardBtn.onclick = () => {
+  currentQuestionIndex++;
+  renderQuestionCard();
+};
+
+// Responder
+submitQuestionBtn.style.cssText = `
+  background-color: black;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 15px;
+`;
+submitQuestionBtn.onclick = () => {
+  const selected = document.querySelector('input[name="questionOption"]:checked');
+  if (!selected) {
+    showNotification("Selecciona una opción");
+    return;
+  }
+  const qData = currentQuestions[currentQuestionIndex];
+  const selIndex = parseInt(selected.value);
+
+  if (selIndex === qData.correctIndex) {
+    questionFeedback.style.color = "green";
+    questionFeedback.textContent = "¡Correcto!";
+    usageStats.correctAnswers++;
+  } else {
+    questionFeedback.style.color = "red";
+    questionFeedback.textContent = "Incorrecto. Sigue estudiando.";
+  }
+  usageStats.totalQuestionsAnswered++;
+  saveToLocal();
+};
+
+// Estilo y funcionalidad del botón "Repetir"
+repeatQuestionCardBtn.style.cssText = `
+  background-color: black;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 15px;
+`;
+repeatQuestionCardBtn.onclick = () => {
+  if (!currentQuestionSlideId || currentQuestionIndex == null) {
+    showNotification("Error: Información de la pregunta actual no está disponible.");
+    return;
+  }
+
+  const currentQCard = { slideId: currentQuestionSlideId, questionIndex: currentQuestionIndex };
+  const exists = repeatQuestions.some(
+    q => q && q.slideId === currentQCard.slideId && q.questionIndex === currentQCard.questionIndex
+  );
+  if (!exists) {
+    repeatQuestions.push(currentQCard);
+    saveToLocal();
+    showNotification("¡Pregunta marcada para repetir!");
+  } else {
+    showNotification("La pregunta ya está marcada para repetir.");
+  }
+};
+		  
+		
+		    // Cerrar modal
+		    closeQuestionCardModal.addEventListener('click', () => {
+		      questionCardModal.classList.remove('active');
+		    });
+		
+		    /* ---------- J. Lógica de Interacciones con LocalStorage ---------- */
+		
+		/* ---------- Favorito ---------- */
+function markFavorite(subject, theme, slide, button) {
+  if (!favorites[subject]) favorites[subject] = {};
+  if (!favorites[subject][theme]) favorites[subject][theme] = [];
+
+  const slideIndex = favorites[subject][theme].indexOf(slide.id);
+
+  if (slideIndex === -1) {
+    // Si el slide no está en favoritos, lo añadimos
+    favorites[subject][theme].push(slide.id);
+    button.style.color = "red"; // Cambiamos el color del corazón a rojo
+    showNotification("¡Añadido a Favoritos!");
+  } else {
+    // Si el slide ya está en favoritos, lo eliminamos
+    favorites[subject][theme].splice(slideIndex, 1);
+    button.style.color = ""; // Volvemos el corazón a su color original
+
+    // Si no quedan favoritos en la temática, eliminamos la clave
+    if (favorites[subject][theme].length === 0) {
+      delete favorites[subject][theme];
+    }
+
+    // Si no quedan temáticas en la asignatura, eliminamos la clave
+    if (Object.keys(favorites[subject]).length === 0) {
+      delete favorites[subject];
+    }
+  }
+
+  // Guardamos los cambios y actualizamos la interfaz de favoritos
+  saveToLocal();
+  loadFavoritesInterface(); // Actualizamos automáticamente la interfaz
+}
+
+		/* ---------- Fin Favorito ---------- */
+		
+		function addNote(slideId) {
+		  // Crear modal de entrada de notas
+		  const modalOverlay = document.createElement('div');
+		  modalOverlay.style.position = 'fixed';
+		  modalOverlay.style.top = '0';
+		  modalOverlay.style.left = '0';
+		  modalOverlay.style.width = '100vw';
+		  modalOverlay.style.height = '100vh';
+		  modalOverlay.style.background = 'rgba(0,0,0,0.5)';
+		  modalOverlay.style.display = 'flex';
+		  modalOverlay.style.justifyContent = 'center';
+		  modalOverlay.style.alignItems = 'center';
+		  modalOverlay.style.zIndex = '1000';
+		
+		  const modalContent = document.createElement('div');
+		  modalContent.style.background = '#fff';
+		  modalContent.style.padding = '20px';
+		  modalContent.style.borderRadius = '8px';
+		  modalContent.style.width = '90%';
+		  modalContent.style.maxWidth = '600px';
+		  modalContent.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+		  modalContent.style.position = 'relative'; // Para posicionar el botón de cerrar
+		
+		  // Botón de cerrar
+		  const closeButton = document.createElement('button');
+		  closeButton.innerHTML = '&#10005;'; // Código HTML para la "X"
+		  closeButton.style.position = 'absolute';
+		  closeButton.style.top = '0px';
+		  closeButton.style.right = '5px';
+		  closeButton.style.background = 'none';
+		  closeButton.style.border = 'none';
+		  closeButton.style.fontSize = '20px';
+		  closeButton.style.cursor = 'pointer';
+		  closeButton.style.color = '#000';
+		
+		  closeButton.addEventListener('click', () => {
+		    document.body.removeChild(modalOverlay); // Cerrar el modal
+		  });
+		
+		  const textArea = document.createElement('textarea');
+		  textArea.style.width = '100%';
+		  textArea.style.height = '200px';
+		  textArea.style.fontFamily = 'inherit';
+		  textArea.style.fontSize = '14px';
+		  textArea.style.lineHeight = '1.5';
+		  textArea.style.resize = 'none';
+		  textArea.value = '• '; // Preescribir la viñeta inicial
+		
+		  const saveButton = document.createElement('button');
+		  saveButton.textContent = 'Guardar';
+		  saveButton.style.marginTop = '10px';
+		  saveButton.style.padding = '8px 12px';
+		  saveButton.style.background = '#000000';
+		  saveButton.style.color = '#fff';
+		  saveButton.style.border = 'none';
+		  saveButton.style.borderRadius = '4px';
+		  saveButton.style.cursor = 'pointer';
+		
+		  saveButton.addEventListener('click', () => {
+		    const noteText = textArea.value.trim();
+		    if (noteText) {
+		      notes.push({ slideId, noteText });
+		      saveToLocal();
+		      showNotification("¡Nota guardada!");		
+		      document.body.removeChild(modalOverlay); // Cerrar modal
+		    }
+		  });
+		
+		  // Agregar funcionalidad para jerarquías
+		  textArea.addEventListener('keydown', (e) => {
+		    const lines = textArea.value.split('\n');
+		    const caretPos = textArea.selectionStart;
+		    const currentLineIndex = lines.reduce((acc, line, i) => {
+		      acc.sum += line.length + 1; // +1 por el salto de línea
+		      if (acc.sum > caretPos && acc.index === null) acc.index = i;
+		      return acc;
+		    }, { sum: 0, index: null }).index;
+		
+		    if (e.key === 'Enter') {
+		      e.preventDefault();
+		      const currentLine = lines[currentLineIndex] || '';
+		      const match = currentLine.match(/^(\s*•\s*)/); // Detectar nivel de indentación actual
+		      const prefix = match ? match[0] : '• ';
+		      const newLine = `\n${prefix}`;
+		      const newPos = caretPos + newLine.length;
+		
+		      textArea.value =
+		        textArea.value.slice(0, caretPos) +
+		        newLine +
+		        textArea.value.slice(caretPos);
+		      textArea.setSelectionRange(newPos, newPos);
+		    } else if (e.key === 'Tab') {
+		      e.preventDefault();
+		      if (e.shiftKey) {
+		        // Reducir indentación
+		        lines[currentLineIndex] = lines[currentLineIndex].replace(/^(\s*)\t/, '');
+		      } else {
+		        // Aumentar indentación
+		        lines[currentLineIndex] = `\t${lines[currentLineIndex]}`;
+		      }
+		      textArea.value = lines.join('\n');
+		      const newPos = caretPos + (e.shiftKey ? -1 : 1);
+		      textArea.setSelectionRange(newPos, newPos);
+		    }
+		  });
+		
+		  modalContent.appendChild(closeButton); // Añadir el botón de cerrar
+		  modalContent.appendChild(textArea);
+		  modalContent.appendChild(saveButton);
+		  modalOverlay.appendChild(modalContent);
+		  document.body.appendChild(modalOverlay);
+		}
+/* ---------- K. Lógica de Flashcards con Efecto de Giro y Mejoras ---------- */
+let currentFlashcardIndex = 0;
+let currentFlashcards = [];
+
+// Abrir el modal de flashcards
+function openFlashcardsModal(slideData) {
+  flashcardsModal.classList.add('active');
+  currentFlashcards = slideData.flashcards || [];
+  currentFlashcardIndex = 0;
+  renderFlashcard();
+}
+
+// Renderizar la flashcard actual
+function renderFlashcard() {
+  if (currentFlashcardIndex < 0) currentFlashcardIndex = 0;
+  if (currentFlashcardIndex >= currentFlashcards.length) currentFlashcardIndex = currentFlashcards.length - 1;
+
+  const fc = currentFlashcards[currentFlashcardIndex];
+  flashcardBody.innerHTML = `
+    <div id="flashcard" class="flashcard" style="perspective: 1200px; width: 100%; max-width: 400px; margin: 20px auto; cursor: pointer;" onclick="flipFlashcard()">
+      <div style="transform: rotateY(0); width: 100%; height: 220px; position: relative; transform-style: preserve-3d; transition: transform 0.6s ease-in-out; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); border-radius: 10px;">
+        <div class="flashcard-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; padding: 20px; background: black; color: white;">
+          <p style="font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px;">Pregunta:</p>
+          <p style="font-size: 16px; text-align: center;">${fc.question}</p>
+        </div>
+        <div class="flashcard-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; padding: 20px; background: white; color: black; transform: rotateY(180deg);">
+          <p style="font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px;">Respuesta:</p>
+          <p style="font-size: 16px; text-align: center;">${fc.answer}</p>
+        </div>
+      </div>
+    </div>
+    <p style="text-align: center; margin-top: 10px;">Flashcard ${currentFlashcardIndex + 1} de ${currentFlashcards.length}</p>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+      <button class="flashcard-btn" onclick="prevFlashcard()">Anterior</button>
+      <button class="flashcard-btn" onclick="nextFlashcard()">Siguiente</button>
+    </div>
+  `;
+}
+
+// Girar la flashcard al hacer clic en la tarjeta
+function flipFlashcard() {
+  const flashcard = document.getElementById('flashcard').firstElementChild;
+  const isFlipped = flashcard.style.transform === 'rotateY(180deg)';
+  flashcard.style.transform = isFlipped ? 'rotateY(0)' : 'rotateY(180deg)';
+}
+
+// Navegar a la flashcard anterior
+function prevFlashcard() {
+  currentFlashcardIndex--;
+  renderFlashcard();
+}
+
+// Navegar a la flashcard siguiente
+function nextFlashcard() {
+  currentFlashcardIndex++;
+  renderFlashcard();
+}
+
+// Función para manejar el botón "Repetir Flashcard Actual"
+repeatFlashcardBtn.onclick = () => {
+  const slideId = (currentSlides[currentSlideIndex] || {}).id || "";
+  const fcId = { slideId, cardIndex: currentFlashcardIndex };
+  
+  const exists = repeatFlashcards.some(
+    fc => fc && fc.slideId === fcId.slideId && fc.cardIndex === fcId.cardIndex
+  );
+
+  if (!exists) {
+    // Si no existe, la agregamos a las flashcards para repetir
+    repeatFlashcards.push(fcId);
+    saveToLocal();
+    showNotification("Flashcard marcada para repetir.");
+  } else {
+    // Si ya existe, mostramos un mensaje
+    showNotification("Esta flashcard ya está marcada para repetir.");
+  }
+};
+
+// Cerrar el modal de flashcards
+closeFlashcardsModal.addEventListener("click", () => {
+  flashcardsModal.classList.remove("active");
+});
+
+// Estilo para los botones y flashcards
+const style = document.createElement('style');
+style.textContent = `
+  .flashcard-btn, #repeatFlashcardBtn {
+    background: black;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    margin: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .flashcard-btn:hover, #repeatFlashcardBtn:hover {
+    background: #333;
+    transform: scale(1.05);
+  }
+
+  .flashcard-btn:focus, #repeatFlashcardBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #555 inset;
+  }
+
+  .flashcard {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+`;
+document.head.appendChild(style);
+		
+		    /* ---------- L. Guardar / Cargar en LocalStorage ---------- */
+		    function saveToLocal() {
+		      localStorage.setItem('favorites', JSON.stringify(favorites));
+		      localStorage.setItem('notes', JSON.stringify(notes));
+		      localStorage.setItem('repeatQuestions', JSON.stringify(repeatQuestions));
+		      localStorage.setItem('repeatFlashcards', JSON.stringify(repeatFlashcards));
+		      localStorage.setItem('examResults', JSON.stringify(examResults));
+		      localStorage.setItem('usageStats', JSON.stringify(usageStats));
+		    }
+		
+		    function loadFromLocal() {
+		      favorites = JSON.parse(localStorage.getItem('favorites')) || {};
+		      notes = JSON.parse(localStorage.getItem('notes')) || [];
+		      repeatQuestions = (JSON.parse(localStorage.getItem('repeatQuestions')) || []).filter(q => q && q.slideId != null && q.questionIndex != null);
+		      repeatFlashcards = (JSON.parse(localStorage.getItem('repeatFlashcards')) || []).filter(fc => fc && fc.slideId != null && fc.cardIndex != null);
+		      examResults = JSON.parse(localStorage.getItem('examResults')) || [];
+		      usageStats = JSON.parse(localStorage.getItem('usageStats')) || {
+		        slidesVisited: 0,
+		        totalQuestionsAnswered: 0,
+		        correctAnswers: 0,
+		        totalExams: 0,
+		        slidesSeenSet: []
+		      };
+		    }
+		
+		    /* ---------- M. Otras Interfaces (Favoritos, Notas, etc.) ---------- */
+function loadFavoritesInterface() {
+  favoritesContent.innerHTML = ''; // Limpiamos la interfaz de favoritos
+
+  // Crear ícono "Volver a Inicio"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Inicio"; // Agregar tooltip al ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('home'); // Regresar a la interfaz de inicio
+  });
+  favoritesContent.appendChild(backIcon);
+
+  // Verificar si hay asignaturas con favoritos
+  if (Object.keys(favorites).length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = "No tienes favoritos aún.";
+    emptyMessage.style.color = "black";
+    favoritesContent.appendChild(emptyMessage);
+    return;
+  }
+
+  // Crear tarjetas para las asignaturas
+  for (let subj in favorites) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = subj;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de imagen
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+  card.style.margin = "10px"; // Ajusta el valor según sea necesario
+
+    card.addEventListener('click', () => loadFavoriteThemes(subj));
+    favoritesContent.appendChild(card);
+  }
+}
+
+function loadFavoriteThemes(subject) {
+  favoritesContent.innerHTML = ''; // Limpiar contenido anterior
+
+  // Crear ícono "Volver a Asignaturas"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Favoritos"; // Agregar tooltip
+  backIcon.addEventListener('click', () => loadFavoritesInterface());
+  favoritesContent.appendChild(backIcon);
+
+  // Crear tarjetas para las temáticas
+  const themes = favorites[subject];
+  for (let them in themes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = them;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de imagen
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+
+    card.addEventListener('click', () => openFavoritesModal(subject, them));
+    favoritesContent.appendChild(card);
+  }
+}
+
+		
+		function openFavoritesModal(subject, theme) {
+		  const modalOverlay = document.createElement('div');
+		  Object.assign(modalOverlay.style, {
+		    position: 'fixed', top: '0', left: '0', width: '100vw', height: '100vh',
+		    background: 'rgba(0, 0, 0, 0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '1000'
+		  });
+		
+		  const modalContent = document.createElement('div');
+		  Object.assign(modalContent.style, {
+		    background: 'white', padding: '20px', borderRadius: '8px', width: '90%',
+		    maxWidth: '800px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', position: 'relative'
+		  });
+		
+		  const closeButton = document.createElement('button');
+		  Object.assign(closeButton.style, {
+		    position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none',
+		    fontSize: '18px', color: 'black', cursor: 'pointer'
+		  });
+		  closeButton.textContent = '✖';
+		  closeButton.addEventListener('click', () => document.body.removeChild(modalOverlay));
+		
+		  const slides = favorites[subject][theme].map(slideId => findSlideData(subject, theme, slideId)).filter(slide => slide);
+		  let currentIndex = 0;
+		
+		  const renderSlide = (index) => {
+		    modalContent.innerHTML = '';
+		
+		    const slideContent = document.createElement('div');
+		    slideContent.innerHTML = slides[index].content;
+		    slideContent.style.color = 'black';
+		    slideContent.style.textAlign = 'center';
+		    slideContent.style.marginBottom = '20px';
+		
+		    const navigationButtons = document.createElement('div');
+		    navigationButtons.style.display = 'flex';
+		    navigationButtons.style.justifyContent = 'space-between';
+		
+		    if (index > 0) {
+		      const prevButton = createNavButton('Anterior', () => renderSlide(index - 1));
+		      navigationButtons.appendChild(prevButton);
+		    } else {
+		      navigationButtons.appendChild(document.createElement('div'));
+		    }
+		
+		    if (index < slides.length - 1) {
+		      const nextButton = createNavButton('Siguiente', () => renderSlide(index + 1));
+		      navigationButtons.appendChild(nextButton);
+		    } else {
+		      navigationButtons.appendChild(document.createElement('div'));
+		    }
+		
+		    modalContent.appendChild(slideContent);
+		    modalContent.appendChild(navigationButtons);
+		    modalContent.appendChild(closeButton);
+		  };
+		
+		  const createNavButton = (text, onClick) => {
+		    const button = document.createElement('button');
+		    Object.assign(button.style, {
+		      padding: '8px 12px', background: 'black', color: 'white', border: 'none',
+		      borderRadius: '4px', cursor: 'pointer'
+		    });
+		    button.textContent = text;
+		    button.addEventListener('click', onClick);
+		    return button;
+		  };
+		
+		  renderSlide(currentIndex);
+		  modalOverlay.appendChild(modalContent);
+		  document.body.appendChild(modalOverlay);
+		}
+		//------------------------------------------------------------------//
+function openFavoritesModal(subject, theme) {
+  const modalOverlay = document.createElement('div');
+  Object.assign(modalOverlay.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100vw',
+    height: '100vh',
+    background: 'rgba(0, 0, 0, 0.8)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: '1000',
+  });
+
+  const modalContent = document.createElement('div');
+  Object.assign(modalContent.style, {
+    background: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '90%',
+    maxWidth: '800px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    position: 'relative',
+    textAlign: 'center',
+    color: 'black',
+  });
+
+  const closeButton = document.createElement('button');
+  Object.assign(closeButton.style, {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    fontSize: '18px',
+    color: 'black',
+    cursor: 'pointer',
+  });
+  closeButton.textContent = '✖';
+  closeButton.addEventListener('click', () => document.body.removeChild(modalOverlay));
+
+  const slides = favorites[subject][theme]
+    .map(slideId => findSlideData(subject, theme, slideId))
+    .filter(Boolean);
+
+  let currentIndex = 0;
+
+  const renderSlide = () => {
+    modalContent.innerHTML = ''; // Limpia el contenido antes de renderizar
+    modalContent.appendChild(closeButton);
+
+    const slideData = slides[currentIndex];
+    const slideContent = document.createElement('div');
+    slideContent.innerHTML = slideData.content;
+    slideContent.style.marginBottom = '20px';
+    modalContent.appendChild(slideContent);
+
+    // Ícono para eliminar de favoritos
+    const removeFavoriteIcon = document.createElement('span');
+    removeFavoriteIcon.innerHTML = "&#128465;"; // Ícono de papelera
+    Object.assign(removeFavoriteIcon.style, {
+      fontSize: '30px',
+      cursor: 'pointer',
+      color: 'red',
+      marginBottom: '10px',
+      display: 'block',
+    });
+    removeFavoriteIcon.title = 'Eliminar de Favoritos';
+    removeFavoriteIcon.addEventListener('click', () => {
+      removeFromFavorites(subject, theme, slideData.id);
+      document.body.removeChild(modalOverlay);
+      loadFavoritesInterface(); // Actualiza la interfaz de favoritos
+    });
+    modalContent.appendChild(removeFavoriteIcon);
+
+    const navigationButtons = document.createElement('div');
+    Object.assign(navigationButtons.style, {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: '20px',
+    });
+
+    if (currentIndex > 0) {
+      const prevButton = createNavButton('Anterior', () => renderSlide(--currentIndex));
+      navigationButtons.appendChild(prevButton);
+    } else {
+      navigationButtons.appendChild(document.createElement('div')); // Espacio vacío para alinear "Siguiente"
+    }
+
+    if (currentIndex < slides.length - 1) {
+      const nextButton = createNavButton('Siguiente', () => renderSlide(++currentIndex));
+      navigationButtons.appendChild(nextButton);
+    } else {
+      navigationButtons.appendChild(document.createElement('div')); // Espacio vacío para alinear "Anterior"
+    }
+
+    modalContent.appendChild(navigationButtons);
+  };
+
+  const createNavButton = (text, onClick) => {
+    const button = document.createElement('button');
+    button.textContent = text;
+    Object.assign(button.style, {
+      padding: '8px 12px',
+      background: 'black',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    });
+    button.addEventListener('click', onClick);
+    return button;
+  };
+
+  const removeFromFavorites = (subject, theme, slideId) => {
+    const index = favorites[subject][theme].indexOf(slideId);
+    if (index !== -1) {
+      favorites[subject][theme].splice(index, 1);
+      if (favorites[subject][theme].length === 0) delete favorites[subject][theme];
+      if (Object.keys(favorites[subject]).length === 0) delete favorites[subject];
+      saveToLocal(); // Guarda los cambios
+      showNotification('¡Eliminado de Favoritos!');
+    }
+  };
+
+  renderSlide();
+  modalOverlay.appendChild(modalContent);
+  document.body.appendChild(modalOverlay);
+}
+
+		//-------------------------------------------------------//
+		
+// Función para cargar la interfaz principal de notas
+function loadNotesInterface() {
+  notesContent.innerHTML = ''; // Limpiar la interfaz de notas
+
+  const groupedNotes = {}; // Organizar notas por asignatura y temática
+  notes.forEach((note, index) => {
+    const slideData = findSlideById(note.slideId);
+    if (slideData) {
+      const { subj, them } = getSubjectThemeById(note.slideId);
+      if (!groupedNotes[subj]) groupedNotes[subj] = {};
+      if (!groupedNotes[subj][them]) groupedNotes[subj][them] = [];
+      groupedNotes[subj][them].push({
+        ...note,
+        index,
+        title: slideData.content.match(/<h2>(.*?)<\/h2>/)?.[1] || "Sin título",
+      });
+    }
+  });
+
+  // Crear ícono "Volver a Inicio"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Inicio"; // Agregar tooltip al ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('home'); // Regresar a la interfaz de inicio
+  });
+  notesContent.appendChild(backIcon);
+
+  // Crear tarjetas para las asignaturas con notas
+  for (const subject in groupedNotes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = subject;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+  card.style.margin = "10px"; // Ajusta el valor según sea necesario
+
+
+    card.addEventListener('click', () => loadNotesForSubject(subject, groupedNotes[subject]));
+    notesContent.appendChild(card);
+  }
+
+  // Si no hay notas, mostrar un mensaje vacío
+  if (Object.keys(groupedNotes).length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = "No tienes notas aún.";
+    emptyMessage.style.color = "black";
+    notesContent.appendChild(emptyMessage);
+  }
+}
+
+// Función para cargar las temáticas de una asignatura
+function loadNotesForSubject(subject, themes) {
+  notesContent.innerHTML = ''; // Limpiar contenido anterior
+
+  // Crear ícono "Volver a Asignaturas"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Notas"; // Agregar tooltip
+  backIcon.addEventListener('click', () => loadNotesInterface());
+  notesContent.appendChild(backIcon);
+
+  // Crear tarjetas para las temáticas
+  for (const theme in themes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = theme;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+
+    card.addEventListener('click', () => showNotesForTheme(themes[theme], `${subject} - ${theme}`));
+    notesContent.appendChild(card);
+  }
+}
+
+// Mostrar las notas de una temática en pantalla exclusiva
+function showNotesForTheme(notesArray, title) {
+  notesContent.innerHTML = `
+    <h2>${title}</h2>
+    <button style="margin-bottom: 10px; padding: 8px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Volver
+    </button>
+  `;
+
+  // Botón para volver a la interfaz principal de notas
+  const backButton = notesContent.querySelector('button');
+  backButton.addEventListener('click', loadNotesInterface);
+
+  const table = document.createElement('table');
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+
+  notesArray.forEach((note) => {
+    const row = document.createElement('tr');
+    row.style.borderBottom = "1px solid #ddd";
+
+    const cell = document.createElement('td');
+    cell.style.padding = "10px";
+    cell.style.position = "relative";
+    cell.style.display = "flex";
+    cell.style.alignItems = "center";
+
+
+
+    const noteDiv = document.createElement('div');
+    noteDiv.innerHTML = `
+      <strong>${note.title}</strong>
+      <br>
+      <pre style="margin: 0; font-family: inherit; white-space: pre-wrap;">${note.noteText}</pre>
+    `;
+
+    // Botón para abrir la diapositiva en un modal
+    const slideIcon = document.createElement('button');
+    slideIcon.innerHTML = "📄"; // Ícono de diapositiva
+    Object.assign(slideIcon.style, {
+      fontSize: "16px",
+      marginRight: "10px",
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "black",
+    });
+    slideIcon.title = "Abrir Diapositiva";
+    slideIcon.addEventListener('click', () => openSlideModal(note.slideId)); // Función para abrir el modal con la diapositiva
+
+    // Botón "x" para eliminar nota
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = "x";
+    Object.assign(deleteBtn.style, {
+      position: "absolute",
+      top: "5px",
+      right: "5px",
+      background: "black",
+      opacity: 0.5,
+      color: "white",
+      border: "none",
+      borderRadius: "50%",
+      width: "20px",
+      height: "20px",
+      fontSize: "12px",
+      cursor: "pointer",
+      zIndex: 10,
+    });
+    deleteBtn.addEventListener('click', () => {
+      if (confirm("¿Estás seguro de que deseas eliminar esta nota?")) {
+        notes.splice(note.index, 1); // Elimina solo la nota en el índice indicado
+        saveToLocal(); // Guarda los cambios
+        showNotesForTheme(notesArray.filter((n) => n !== note), title); // Recarga solo las notas restantes
+        showNotification("¡Nota eliminada exitosamente!");
+      }
+    });
+
+    cell.appendChild(slideIcon); // Agregar el ícono de diapositiva
+    noteDiv.appendChild(deleteBtn); // Agregar el botón eliminar
+    cell.appendChild(noteDiv); // Agregar la nota
+    row.appendChild(cell); // Agregar la celda a la fila
+    table.appendChild(row); // Agregar la fila a la tabla
+  });
+
+  notesContent.appendChild(table);
+}
+
+// Función para abrir un modal con la diapositiva correspondiente
+function openSlideModal(slideId) {
+  const modalOverlay = document.createElement('div');
+  Object.assign(modalOverlay.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100vw',
+    height: '100vh',
+    background: 'rgba(0, 0, 0, 0.8)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: '1000',
+  });
+
+  const modalContent = document.createElement('div');
+  Object.assign(modalContent.style, {
+    background: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '90%',
+    maxWidth: '800px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    position: 'relative',
+  });
+
+  const closeButton = document.createElement('button');
+  Object.assign(closeButton.style, {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    fontSize: '18px',
+    color: 'black',
+    cursor: 'pointer',
+  });
+  closeButton.textContent = '✖';
+  closeButton.addEventListener('click', () => document.body.removeChild(modalOverlay));
+
+  const slideData = findSlideById(slideId);
+  if (slideData) {
+    const slideContent = document.createElement('div');
+    slideContent.innerHTML = slideData.content; // Contenido de la diapositiva
+    modalContent.appendChild(slideContent);
+  } else {
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = "La diapositiva no se encontró.";
+    errorMessage.style.color = "red";
+    modalContent.appendChild(errorMessage);
+  }
+
+  modalContent.appendChild(closeButton);
+  modalOverlay.appendChild(modalContent);
+  document.body.appendChild(modalOverlay);
+}
+// Notificación no intrusiva---------------------------------------------------------------------------------//
+// Mostrar notificación en la esquina superior derecha
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  Object.assign(notification.style, {
+    position: 'fixed',
+    top: '10px',
+    right: '10px',
+    background: '#000',
+    color: 'white',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    zIndex: 1000,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    transition: 'opacity 0.3s ease',
+    opacity: '1',
+  });
+  document.body.appendChild(notification);
+
+  // Fade out and remove the notification after 2 seconds
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 300); // Allow time for transition
+  }, 2000);
+}
+		
+function loadQuestionsRepeatInterface() {
+  questionsContent.innerHTML = ''; // Limpiamos la interfaz de preguntas repetidas
+
+  // Crear ícono "Volver a Inicio"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Inicio"; // Tooltip para el ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('home'); // Regresar a la interfaz de inicio
+  });
+  questionsContent.appendChild(backIcon);
+
+  const groupedQuestions = groupRepeatQuestionItems(repeatQuestions);
+
+  // Verificar si hay preguntas agrupadas
+  if (Object.keys(groupedQuestions).length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = "No hay preguntas repetidas aún.";
+    emptyMessage.style.color = "black";
+    questionsContent.appendChild(emptyMessage);
+    return;
+  }
+
+  // Crear tarjetas para las asignaturas
+  for (let subject in groupedQuestions) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = subject;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "10px";
+    card.style.fontWeight = "bold";
+
+    card.addEventListener('click', () => loadQuestionsRepeatThemes(subject, groupedQuestions[subject]));
+    questionsContent.appendChild(card);
+  }
+}
+
+function loadQuestionsRepeatThemes(subject, themes) {
+  questionsContent.innerHTML = ''; // Limpiar contenido anterior
+
+  // Crear ícono "Volver a Asignaturas"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Asignaturas"; // Tooltip para el ícono
+  backIcon.addEventListener('click', () => loadQuestionsRepeatInterface());
+  questionsContent.appendChild(backIcon);
+
+  // Crear tarjetas para las temáticas
+  for (let theme in themes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = theme;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('examen.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "10px";
+    card.style.fontWeight = "bold";
+
+    card.addEventListener('click', () => openThemeQuestionsModal(themes[theme], `${subject} - ${theme}`));
+    questionsContent.appendChild(card);
+  }
+}
+
+// Agrupar preguntas repetidas por asignatura y temática
+function groupRepeatQuestionItems(items) {
+  const result = {};
+  items.forEach(qObj => {
+    if (!qObj || !qObj.slideId || qObj.questionIndex == null) return;
+
+    const slideData = findSlideById(qObj.slideId);
+    if (slideData) {
+      const { subj, them } = getSubjectThemeById(qObj.slideId);
+      if (!result[subj]) result[subj] = {};
+      if (!result[subj][them]) result[subj][them] = [];
+      result[subj][them].push(qObj);
+    }
+  });
+  return result;
+}
+
+// Abrir modal con todas las preguntas de una temática
+function openThemeQuestionsModal(questionsArray, title) {
+  let currentModalQuestionIndex = 0;
+
+  const modal = document.createElement('div');
+  modal.classList.add('modal-overlay');
+  Object.assign(modal.style, {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'rgba(0, 0, 0, 0.7)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  });
+
+  const modalContent = document.createElement('div');
+  Object.assign(modalContent.style, {
+    background: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    maxWidth: '600px',
+    width: '90%',
+    textAlign: 'center',
+    position: 'relative',
+  });
+
+  const renderModalQuestion = () => {
+    const qObj = questionsArray[currentModalQuestionIndex];
+    const slideData = findSlideById(qObj.slideId);
+
+    if (!slideData || !slideData.questions[qObj.questionIndex]) return;
+
+    const questionData = slideData.questions[qObj.questionIndex];
+    modalContent.innerHTML = `
+      <h2>${title}</h2>
+      <h3>${slideData.content.match(/<h2>(.*?)<\/h2>/)?.[1] || "Sin título"}</h3>
+      <p>${questionData.text}</p>
+      <div style="margin-top: 10px;">
+        ${questionData.options
+          .map(
+            (option, index) => `
+          <div style="text-align: left; margin-bottom: 5px;">
+            <input type="radio" id="option_${index}" name="modalQuestionOption" value="${index}">
+            <label for="option_${index}">${option}</label>
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+      <div style="margin-top: 20px;">
+        <button id="prevModalQuestionBtn" style="padding: 8px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Anterior
+        </button>
+        <button id="submitModalAnswerBtn" style="padding: 8px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Responder
+        </button>
+        <button id="nextModalQuestionBtn" style="padding: 8px; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Siguiente
+        </button>
+      </div>
+    `;
+
+    // Ícono para eliminar pregunta
+    const removeQuestionIcon = document.createElement('span');
+    removeQuestionIcon.innerHTML = "&#128465;"; // Ícono de papelera
+    Object.assign(removeQuestionIcon.style, {
+      fontSize: '20px',
+      cursor: 'pointer',
+      color: 'red',
+      position: 'absolute',
+      top: '10px',
+      left: '10px',
+    });
+    removeQuestionIcon.title = 'Eliminar de Repetición';
+    removeQuestionIcon.addEventListener('click', () => {
+      removeRepeatQuestion(qObj);
+      modal.remove();
+      loadQuestionsRepeatInterface(); // Recarga la interfaz de preguntas repetidas
+    });
+
+    modalContent.appendChild(removeQuestionIcon);
+
+    const prevBtn = modalContent.querySelector('#prevModalQuestionBtn');
+    const nextBtn = modalContent.querySelector('#nextModalQuestionBtn');
+    const submitBtn = modalContent.querySelector('#submitModalAnswerBtn');
+
+    prevBtn.disabled = currentModalQuestionIndex === 0;
+    nextBtn.disabled = currentModalQuestionIndex === questionsArray.length - 1;
+
+    prevBtn.onclick = () => {
+      currentModalQuestionIndex--;
+      renderModalQuestion();
+    };
+
+    nextBtn.onclick = () => {
+      currentModalQuestionIndex++;
+      renderModalQuestion();
+    };
+
+    submitBtn.onclick = () => {
+      const selected = document.querySelector('input[name="modalQuestionOption"]:checked');
+      if (!selected) {
+        alert("Selecciona una opción");
+        return;
+      }
+      const selectedIndex = parseInt(selected.value);
+      if (selectedIndex === questionData.correctIndex) {
+        showNotification("¡Correcto!");
+      } else {
+        showNotification("Incorrecto. Sigue estudiando.");
+      }
+    };
+  };
+
+  const closeModal = () => {
+    modal.remove();
+  };
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = "Cerrar";
+  Object.assign(closeBtn.style, {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'black',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '5px 10px',
+    cursor: 'pointer',
+  });
+  closeBtn.onclick = closeModal;
+
+  modal.appendChild(modalContent);
+  modal.appendChild(closeBtn);
+  document.body.appendChild(modal);
+
+  renderModalQuestion();
+}
+
+// Función para eliminar preguntas de repetición
+function removeRepeatQuestion(questionObj) {
+  const index = repeatQuestions.findIndex(
+    q => q.slideId === questionObj.slideId && q.questionIndex === questionObj.questionIndex
+  );
+  if (index !== -1) {
+    repeatQuestions.splice(index, 1);
+    saveToLocal(); // Guarda los cambios
+    showNotification('Pregunta eliminada de repetición.');
+  }
+}
+
+		
+function loadFlashcardsRepeatInterface() {
+  flashcardsContent.innerHTML = ''; // Limpiar la interfaz de flashcards repetidas
+
+  // Crear ícono "Volver a Inicio"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Inicio"; // Tooltip para el ícono
+  backIcon.addEventListener('click', () => {
+    switchInterface('home'); // Regresar a la interfaz de inicio
+  });
+  flashcardsContent.appendChild(backIcon);
+
+  const groupedFlashcards = groupFlashcardItems(repeatFlashcards);
+
+  // Mostrar mensaje si no hay flashcards repetidas
+  if (Object.keys(groupedFlashcards).length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = "No hay flashcards repetidas aún.";
+    emptyMessage.style.color = "black";
+    flashcardsContent.appendChild(emptyMessage);
+    return;
+  }
+
+  // Crear tarjetas para las asignaturas
+  for (let subject in groupedFlashcards) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = subject;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+    card.style.margin = "10px";
+
+    card.addEventListener('click', () => loadFlashcardThemes(subject, groupedFlashcards[subject]));
+    flashcardsContent.appendChild(card);
+  }
+}
+
+function loadFlashcardThemes(subject, themes) {
+  flashcardsContent.innerHTML = ''; // Limpiar contenido anterior
+
+  // Crear ícono "Volver a Asignaturas"
+  const backIcon = document.createElement('div');
+  backIcon.innerHTML = "&#8592;"; // Flecha izquierda
+  backIcon.style.cssText = `
+    font-size: 1.5em;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 15px;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+  `;
+  backIcon.title = "Volver a Asignaturas"; // Tooltip para el ícono
+  backIcon.addEventListener('click', () => loadFlashcardsRepeatInterface());
+  flashcardsContent.appendChild(backIcon);
+
+  // Crear tarjetas para las temáticas
+  for (let theme in themes) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = theme;
+
+    // Estilo de fondo
+    card.style.backgroundImage = "url('examen.jpg')"; // Ruta de la imagen de fondo
+    card.style.backgroundSize = "cover";
+    card.style.backgroundPosition = "center";
+    card.style.borderRadius = "8px";
+    card.style.color = "white";
+    card.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    card.style.padding = "20px";
+    card.style.fontWeight = "bold";
+    card.style.margin = "10px";
+
+    card.addEventListener('click', () => openThemeFlashcardsModal(themes[theme], `${subject} - ${theme}`));
+    flashcardsContent.appendChild(card);
+  }
+}
+
+// Agrupar flashcards repetidas por asignatura y temática
+function groupFlashcardItems(items) {
+  const result = {};
+  items.forEach(fcObj => {
+    if (!fcObj || !fcObj.slideId || fcObj.cardIndex == null) return;
+
+    const slideData = findSlideById(fcObj.slideId);
+    if (slideData) {
+      const { subj, them } = getSubjectThemeById(fcObj.slideId);
+      if (!result[subj]) result[subj] = {};
+      if (!result[subj][them]) result[subj][them] = [];
+      result[subj][them].push(fcObj);
+    }
+  });
+  return result;
+}
+
+// Abrir modal con todas las flashcards de una temática
+function openThemeFlashcardsModal(flashcardsArray, title) {
+  let currentModalFlashcardIndex = 0;
+
+  const modal = document.createElement('div');
+  modal.classList.add('modal-overlay');
+  Object.assign(modal.style, {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'rgba(0, 0, 0, 0.7)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  });
+
+  const modalContent = document.createElement('div');
+  Object.assign(modalContent.style, {
+    background: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    maxWidth: '600px',
+    width: '90%',
+    textAlign: 'center',
+    position: 'relative',
+  });
+
+  const renderModalFlashcard = () => {
+    const fcObj = flashcardsArray[currentModalFlashcardIndex];
+    const slideData = findSlideById(fcObj.slideId);
+
+    if (!slideData || !slideData.flashcards[fcObj.cardIndex]) return;
+
+    const flashcardData = slideData.flashcards[fcObj.cardIndex];
+    modalContent.innerHTML = `
+      <h2>${title}</h2>
+      <p><strong>Pregunta:</strong> ${flashcardData.question}</p>
+      <p><strong>Respuesta:</strong> ${flashcardData.answer}</p>
+      <p>Flashcard ${currentModalFlashcardIndex + 1} de ${flashcardsArray.length}</p>
+    `;
+
+    const deleteFlashcardIcon = document.createElement('span');
+    deleteFlashcardIcon.innerHTML = "&#128465;"; // Ícono de papelera
+    Object.assign(deleteFlashcardIcon.style, {
+      fontSize: '20px',
+      cursor: 'pointer',
+      color: 'red',
+      position: 'absolute',
+      top: '10px',
+      left: '10px',
+    });
+    deleteFlashcardIcon.title = "Eliminar de Repetición";
+    deleteFlashcardIcon.addEventListener('click', () => {
+      removeFlashcardFromRepeat(fcObj);
+      modal.remove();
+      loadFlashcardsRepeatInterface(); // Recarga la interfaz
+    });
+
+    modalContent.appendChild(deleteFlashcardIcon);
+
+    const navigationButtons = document.createElement('div');
+    Object.assign(navigationButtons.style, {
+      marginTop: '20px',
+    });
+
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = "Anterior";
+    Object.assign(prevBtn.style, {
+      padding: '8px',
+      background: 'black',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    });
+    prevBtn.disabled = currentModalFlashcardIndex === 0;
+    prevBtn.addEventListener('click', () => {
+      currentModalFlashcardIndex--;
+      renderModalFlashcard();
+    });
+
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = "Siguiente";
+    Object.assign(nextBtn.style, {
+      padding: '8px',
+      background: 'black',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    });
+    nextBtn.disabled = currentModalFlashcardIndex === flashcardsArray.length - 1;
+    nextBtn.addEventListener('click', () => {
+      currentModalFlashcardIndex++;
+      renderModalFlashcard();
+    });
+
+    navigationButtons.appendChild(prevBtn);
+    navigationButtons.appendChild(nextBtn);
+
+    modalContent.appendChild(navigationButtons);
+  };
+
+  const closeModal = () => {
+    modal.remove();
+  };
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = "Cerrar";
+  Object.assign(closeBtn.style, {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: 'black',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '5px 10px',
+    cursor: 'pointer',
+  });
+  closeBtn.onclick = closeModal;
+
+  modal.appendChild(modalContent);
+  modal.appendChild(closeBtn);
+  document.body.appendChild(modal);
+
+  renderModalFlashcard();
+}
+
+// Función para eliminar flashcard de repetición
+function removeFlashcardFromRepeat(flashcardObj) {
+  const index = repeatFlashcards.findIndex(
+    fc => fc.slideId === flashcardObj.slideId && fc.cardIndex === flashcardObj.cardIndex
+  );
+  if (index !== -1) {
+    repeatFlashcards.splice(index, 1);
+    saveToLocal();
+    showNotification("Flashcard eliminada de repetición.");
+  }
+}
+		
+/* ---------- N. Interfaz de Examen Mejorada ---------- */
+/* ---------- N. Interfaz de Examen Mejorada ---------- */
+function loadExamInterface() {
+  examContent.innerHTML = `
+    <h3>Configurar Examen</h3>
+    <div id="examSubjectList"></div>
+    <label>Número de preguntas:
+      <input type="number" id="examNumberInput" min="1" value="5" />
+    </label>
+    <br><br>
+    <button id="examStartBtn" class="exam-btn">Iniciar Examen</button>
+  `;
+
+  const examSubjectList = document.getElementById("examSubjectList");
+  const examNumberInput = document.getElementById("examNumberInput");
+
+  // Crear la lista de asignaturas y temáticas
+  for (let subj in data) {
+    const subjectDiv = document.createElement("div");
+    subjectDiv.classList.add("card");
+    subjectDiv.textContent = subj;
+
+    // Asignar imagen de fondo
+    subjectDiv.style.backgroundImage = "url('asignaturas.jpg')"; // Ruta de la imagen
+    subjectDiv.style.backgroundSize = "cover";
+    subjectDiv.style.backgroundPosition = "center";
+    subjectDiv.style.borderRadius = "8px";
+    subjectDiv.style.color = "white";
+    subjectDiv.style.textShadow = "0px 0px 5px rgba(0, 0, 0, 0.7)";
+    subjectDiv.style.padding = "20px";
+    subjectDiv.style.fontWeight = "bold";
+    subjectDiv.style.marginBottom = "15px";
+    subjectDiv.style.cursor = "pointer";
+    subjectDiv.style.margin = "10px";
+
+    const themeContainer = document.createElement("div");
+    themeContainer.style.marginLeft = "20px";
+    themeContainer.style.display = "none";
+
+    const allThemesCheckbox = document.createElement("input");
+    allThemesCheckbox.type = "checkbox";
+    allThemesCheckbox.style.marginRight = "10px";
+    allThemesCheckbox.addEventListener("change", () => {
+      const themeCheckboxes = themeContainer.querySelectorAll("input[type='checkbox']");
+      themeCheckboxes.forEach((checkbox) => (checkbox.checked = allThemesCheckbox.checked));
+    });
+
+    subjectDiv.prepend(allThemesCheckbox);
+
+    for (let them in data[subj]) {
+      const themeDiv = document.createElement("div");
+      themeDiv.style.marginBottom = "5px";
+
+      const themeCheckbox = document.createElement("input");
+      themeCheckbox.type = "checkbox";
+      themeCheckbox.style.marginRight = "10px";
+      themeCheckbox.dataset.subject = subj;
+      themeCheckbox.dataset.theme = them;
+
+      themeDiv.appendChild(themeCheckbox);
+      themeDiv.appendChild(document.createTextNode(them));
+      themeContainer.appendChild(themeDiv);
+    }
+
+    subjectDiv.addEventListener("click", () => {
+      themeContainer.style.display = themeContainer.style.display === "none" ? "block" : "none";
+    });
+
+    examSubjectList.appendChild(subjectDiv);
+    examSubjectList.appendChild(themeContainer);
+  }
+
+  const examStartBtn = document.getElementById("examStartBtn");
+  examStartBtn.addEventListener("click", () => {
+    const selectedThemes = [];
+    const selectedCheckboxes = examSubjectList.querySelectorAll("input[type='checkbox']:checked");
+    selectedCheckboxes.forEach((checkbox) => {
+      if (checkbox.dataset.subject && checkbox.dataset.theme) {
+        selectedThemes.push({ subject: checkbox.dataset.subject, theme: checkbox.dataset.theme });
+      }
+    });
+
+    const num = parseInt(examNumberInput.value) || 5;
+
+    if (selectedThemes.length === 0) {
+      showNotification("Selecciona al menos una temática o asignatura.");
+      return;
+    }
+
+    startExamExclusive(selectedThemes, num, examStartBtn); // Pasar el botón para controlarlo
+  });
+}
+
+/* ---------- Interfaz Exclusiva para el Examen ---------- */
+function startExamExclusive(selectedThemes, num, examStartBtn) {
+  const themesList = selectedThemes.map((t) => `${t.subject}: ${t.theme}`).join(", ");
+  currentExam = { themes: themesList };
+  examContent.innerHTML = `
+    <button id="backToConfigBtn" class="exam-btn">Volver</button>
+    <h3>Examen</h3>
+    <div id="examQuestionsSection"></div>
+    <button id="examSubmitBtn" class="exam-btn" style="margin-top: 20px;">Enviar Examen</button>
+    <div id="examResult"></div>
+  `;
+
+  const backToConfigBtn = document.getElementById("backToConfigBtn");
+  backToConfigBtn.addEventListener("click", () => {
+    examStartBtn.disabled = false; // Reactivar el botón de iniciar examen
+    loadExamInterface(); // Volver a la configuración del examen
+  });
+
+  const examQuestionsSection = document.getElementById("examQuestionsSection");
+  const examSubmitBtn = document.getElementById("examSubmitBtn");
+
+  let allQuestions = [];
+
+  selectedThemes.forEach(({ subject, theme }) => {
+    const slides = data[subject][theme];
+    const questionSlides = slides.filter((s) => s.questions && s.questions.length > 0);
+
+    questionSlides.forEach((slide) => {
+      slide.questions.forEach((q) => {
+        allQuestions.push(q);
+      });
+    });
+  });
+
+  shuffleArray(allQuestions);
+
+  currentExamQuestions = allQuestions.slice(0, num);
+  currentExamAnswers = Array(currentExamQuestions.length).fill(null);
+
+  currentExamQuestions.forEach((questionData, idx) => {
+    const container = document.createElement("div");
+    container.style.marginBottom = "20px";
+    container.innerHTML = `<h4>Pregunta ${idx + 1}: ${questionData.text}</h4>`;
+
+    questionData.options.forEach((opt, optIdx) => {
+      const radioDiv = document.createElement("div");
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `examQuestion_${idx}`;
+      radio.value = optIdx;
+      radio.addEventListener("change", () => {
+        currentExamAnswers[idx] = parseInt(radio.value);
+      });
+
+      const label = document.createElement("label");
+      label.textContent = " " + opt;
+
+      radioDiv.appendChild(radio);
+      radioDiv.appendChild(label);
+      container.appendChild(radioDiv);
+    });
+
+    examQuestionsSection.appendChild(container);
+  });
+
+  examSubmitBtn.addEventListener("click", () => {
+    submitExam(examSubmitBtn);
+  });
+}
+
+/* ---------- Función para Mostrar Resultados ---------- */
+function submitExam(examSubmitBtn) {
+  examSubmitBtn.disabled = true; // Deshabilitar el botón al enviar el examen
+  const examQuestionsSection = document.getElementById("examQuestionsSection");
+  const examResultDiv = document.getElementById("examResult");
+  let correctCount = 0;
+
+  currentExamQuestions.forEach((qData, idx) => {
+    const isCorrect = currentExamAnswers[idx] === qData.correctIndex;
+
+    if (isCorrect) {
+      correctCount++;
+    }
+
+    const questionContainer = examQuestionsSection.children[idx];
+    let feedbackDiv = questionContainer.querySelector(".feedback");
+    if (!feedbackDiv) {
+      feedbackDiv = document.createElement("div");
+      feedbackDiv.classList.add("feedback");
+      feedbackDiv.style.marginTop = "10px";
+      feedbackDiv.style.padding = "8px";
+      feedbackDiv.style.borderRadius = "4px";
+      feedbackDiv.style.fontWeight = "bold";
+      questionContainer.appendChild(feedbackDiv);
+    }
+
+    feedbackDiv.textContent = isCorrect ? "¡Correcto!" : "Incorrecto";
+    feedbackDiv.style.backgroundColor = isCorrect ? "#d4edda" : "#f8d7da";
+    feedbackDiv.style.color = isCorrect ? "#155724" : "#721c24";
+    feedbackDiv.style.border = isCorrect ? "1px solid #c3e6cb" : "1px solid #f5c6cb";
+  });
+
+  const total = currentExamQuestions.length;
+  const score = Math.round((correctCount / total) * 100);
+
+  examResults.push({
+    date: new Date().toLocaleString(),
+    total,
+    correct: correctCount,
+    score,
+    themes: currentExam.themes, // Agregar las temáticas al resultado
+  });
+
+  usageStats.totalExams++;
+  saveToLocal();
+
+  examResultDiv.innerHTML = `
+    <h3>Resultados</h3>
+    <p>Respuestas correctas: ${correctCount} de ${total}</p>
+    <p>Calificación: ${score} / 100</p>
+    <p>Temáticas: ${currentExam.themes}</p>
+
+  `;
+}
+
+		
+		    /* ---------- Ñ. Función para Mezclar un Array ---------- */
+		    function shuffleArray(arr) {
+		      for (let i = arr.length - 1; i > 0; i--) {
+		        const j = Math.floor(Math.random() * (i + 1));
+		        [arr[i], arr[j]] = [arr[j], arr[i]];
+		      }
+		    }
+		
+		    /* ---------- O. Interfaz Desempeño ---------- */
+/* ---------- O. Interfaz Desempeño Mejorada ---------- */
+function loadPerformanceInterface() {
+  performanceContent.innerHTML = `
+    <h3 style="text-align: center; margin-bottom: 20px;">Estadísticas de Desempeño</h3>
+    <div id="performanceContainer" style="display: flex; flex-direction: column; align-items: center; gap: 40px;">
+      <div id="doughnutChartContainer" style="width: 100%; max-width: 400px; text-align: center;">
+        <canvas id="doughnutChart" width="300" height="300"></canvas>
+        <h4>Distribución de Respuestas</h4>
+      </div>
+      <div id="chartsContainer" style="width: 100%; max-width: 600px;"></div>
+      <div id="examTableContainer" style="width: 100%; overflow-x: auto;">
+        <h4 style="margin-bottom: 10px; text-align: center;">Desempeño Detallado</h4>
+      </div>
+    </div>
+  `;
+
+  // Renderizar gráfica de dona
+  renderDoughnutChart();
+
+  // Renderizar las gráficas dinámicamente
+  renderCharts();
+
+  // Renderizar tabla de desempeño
+  renderExamTable();
+}
+
+function renderDoughnutChart() {
+  const totalQuestions = usageStats.totalQuestionsAnswered || 0;
+  const correctQuestions = usageStats.correctAnswers || 0;
+  const incorrectQuestions = totalQuestions - correctQuestions;
+
+  const doughnutCtx = document.getElementById("doughnutChart").getContext("2d");
+  new Chart(doughnutCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["Correctas", "Incorrectas"],
+      datasets: [
+        {
+          data: [correctQuestions, incorrectQuestions],
+          backgroundColor: ["#4CAF50", "#F44336"],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: { display: true },
+      },
+    },
+  });
+}
+
+function renderCharts() {
+  const chartsContainer = document.getElementById("chartsContainer");
+  chartsContainer.innerHTML = "";
+
+  const totalCharts = Math.ceil(examResults.length / 15) || 1;
+
+  for (let chartIndex = 0; chartIndex < totalCharts; chartIndex++) {
+    const chartDiv = document.createElement("div");
+    chartDiv.style.marginBottom = "20px";
+    chartDiv.style.textAlign = "center";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 300;
+    canvas.height = 300;
+
+    const chartTitle = document.createElement("h4");
+    chartTitle.textContent = `Desempeño en Exámenes - Gráfico ${chartIndex + 1}`;
+    chartDiv.appendChild(chartTitle);
+    chartDiv.appendChild(canvas);
+    chartsContainer.appendChild(chartDiv);
+
+    const examSubset = examResults.slice(chartIndex * 15, (chartIndex + 1) * 15);
+    const examDates = examSubset.map((res) => res.date);
+    const examScores = examSubset.map((res) => res.score);
+
+    new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: examDates,
+        datasets: [
+          {
+            label: `Desempeño en Exámenes (${chartIndex + 1})`,
+            data: examScores,
+            borderColor: "#3F51B5",
+            backgroundColor: "rgba(63, 81, 181, 0.3)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          legend: { display: true },
+        },
+        scales: {
+          x: { title: { display: true, text: "Fecha" } },
+          y: { title: { display: true, text: "Calificación (%)" }, min: 0, max: 100 },
+        },
+      },
+    });
+  }
+}
+
+function renderExamTable() {
+  const examTableContainer = document.getElementById("examTableContainer");
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr style="background-color: #f5f5f5;">
+      <th style="padding: 10px; border: 1px solid #ddd;">Fecha</th>
+      <th style="padding: 10px; border: 1px solid #ddd;">Preguntas</th>
+      <th style="padding: 10px; border: 1px solid #ddd;">Correctas</th>
+      <th style="padding: 10px; border: 1px solid #ddd;">Calificación (%)</th>
+      <th style="padding: 10px; border: 1px solid #ddd;">Temáticas</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  examResults.forEach((res) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td style="padding: 10px; border: 1px solid #ddd;">${res.date}</td>
+      <td style="padding: 10px; border: 1px solid #ddd;">${res.total}</td>
+      <td style="padding: 10px; border: 1px solid #ddd;">${res.correct}</td>
+      <td style="padding: 10px; border: 1px solid #ddd;">${res.score}</td>
+      <td style="padding: 10px; border: 1px solid #ddd;">${res.themes ? res.themes : "N/A"}</td>
+    `;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  examTableContainer.appendChild(table);
+}
+/* ---------- Funciones Auxiliares ---------- */
+function findSlideData(subject, theme, slideId) {
+  const arr = data[subject][theme];
+  return arr.find(s => s.id === slideId);
+}
+function findSlideById(slideId) {
+  for (let subj in data) {
+    for (let them in data[subj]) {
+      for (let sld of data[subj][them]) {
+        if (sld.id === slideId) return sld;
+      }
+    }
+  }
+  return null;
+}
+/* Agrupar IDs de preguntas repetidas por asignatura/temática */
+function groupRepeatItems(items) {
+  // Estructura -> { subj: { theme: [slideIds] } }
+  const result = {};
+  items.forEach(slideId => {
+    const found = findSlideById(slideId);
+    if (found) {
+      const { subj, them } = getSubjectThemeById(slideId);
+      if (!result[subj]) result[subj] = {};
+      if (!result[subj][them]) result[subj][them] = [];
+      result[subj][them].push(slideId);
+    }
+  });
+  return result;
+}
+/* Agrupar flashcards repetidas */
+function groupFlashcardItems(items) {
+  // Estructura -> { subj: { theme: [ {slideId,cardIndex} ] } }
+  const result = {};
+  items.forEach(fcObj => {
+    const found = findSlideById(fcObj.slideId);
+    if (found) {
+      const { subj, them } = getSubjectThemeById(fcObj.slideId);
+      if (!result[subj]) result[subj] = {};
+      if (!result[subj][them]) result[subj][them] = [];
+      result[subj][them].push(fcObj);
+    }
+  });
+  return result;
+}
+function getSubjectThemeById(slideId) {
+  for (let subj in data) {
+    for (let them in data[subj]) {
+      for (let sld of data[subj][them]) {
+        if (sld.id === slideId) {
+          return { subj, them };
+        }
+      }
+    }
+  }
+  return { subj: null, them: null };
+}
+		
+		    /* ---------- Q. Inicialización ---------- */
+		    window.onload = () => {
+		      loadFromLocal();
+		      switchInterface('home');
+		    };
+		
+		
+	</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>
